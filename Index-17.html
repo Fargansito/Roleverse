@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roleplay Between Us</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d14; --panel:#171722; --panel2:#20202d; --line:#323244;
+  --text:#f4f1f8; --muted:#aaa7b7; --accent:#c66cff; --accent2:#6d7cff;
+}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top,#242039 0,#0d0d14 45%);color:var(--text);font-family:'Inter',Arial,Helvetica,sans-serif;min-height:100vh}
+button,input,textarea{font:inherit}
+button{cursor:pointer;border:0}
+#app{min-height:100vh}
+.topbar{min-height:64px;background:rgba(18,18,28,.9);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:8px 22px;gap:14px;justify-content:space-between;position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}
+.brand{font-weight:800;letter-spacing:1px}.brand span{color:var(--accent)}
+.back-btn{display:none;background:var(--panel2);color:var(--text);padding:9px 14px;border-radius:9px;font-weight:bold}.back-btn.show{display:inline-flex;align-items:center;gap:4px}.back-btn:hover{background:#2b2b3d}
+.backup-actions{display:flex;gap:8px}.backup-actions button{background:var(--panel2);color:var(--muted);padding:9px 12px;border-radius:9px;font-size:.82rem}.backup-actions button:hover{color:#fff;background:#2b2b3d}
+.search-box{width:100%;max-width:420px;margin:0 0 20px;background:var(--panel2);border:1px solid var(--line);color:#fff;padding:11px 14px;border-radius:10px}
+.empty-hint{color:var(--muted);grid-column:1/-1;padding:20px 0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#242034;border:1px solid var(--accent);color:#fff;padding:12px 20px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:min(420px,90vw);text-align:center;font-size:.88rem}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast.error{border-color:#ff7188}
+.edit-msg-textarea{width:100%;min-height:70px;background:#222230;border:1px solid var(--line);color:#fff;border-radius:9px;padding:10px;resize:vertical}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.nav button{background:transparent;color:var(--muted);padding:10px 14px;border-radius:9px}.nav button:hover,.nav button.active{background:var(--panel2);color:#fff}
+.screen{display:none}.screen.active{display:block}
+.home{max-width:1050px;margin:auto;padding:50px 22px}
+.hero{text-align:center;padding:35px 10px 50px}.hero h1{font-size:clamp(2.4rem,6vw,5rem);margin:0}.hero p{color:var(--muted);font-size:1.05rem}
+.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:13px 20px;border-radius:10px;font-weight:bold}
+.stories{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.story{position:relative;background:linear-gradient(145deg,#202031,#151520);border:1px solid var(--line);border-radius:18px;padding:20px;min-height:190px;transition:.2s;cursor:pointer}.story:hover{transform:translateY(-4px);border-color:var(--accent)}
+.story-actions{position:absolute;right:14px;bottom:14px;display:flex;gap:8px;z-index:2}.story-edit,.story-delete{background:#2b2b3b;color:#e9e4ef;border:1px solid #4a4860;border-radius:9px;padding:10px 13px;font-size:.82rem}.story-edit:hover{border-color:var(--accent);background:#343043}.story-delete{background:#302733;color:#ffb4c0;border-color:#5a3d48}.story-delete:hover{background:#472c38;border-color:#ff7188}
+.character-card{cursor:pointer}.character-image{width:76px;height:76px;border-radius:16px;object-fit:cover;border:1px solid #4a4860;display:block;margin-bottom:10px}.message-image{display:block;max-width:min(520px,100%);max-height:420px;width:auto;height:auto;border-radius:12px;border:1px solid #3b394b;margin-top:10px;object-fit:contain}.message-actions{display:flex;justify-content:flex-end;margin-top:8px}.delete-msg{background:#302733;color:#ffb4c0;border:1px solid #5a3d48;border-radius:7px;padding:5px 9px;font-size:.75rem}.delete-msg:hover{background:#472c38;border-color:#ff7188}.image-preview{width:130px;height:130px;border-radius:16px;object-fit:cover;border:1px solid #4a4860;background:#222230;display:none;margin:8px 0 14px}.upload-label{display:block;margin:2px 0 5px}.file-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.clear-image{background:#2b2b38;color:#ddd;border:1px solid #464458;border-radius:8px;padding:7px 10px;font-size:.8rem}.danger{background:#4a2630;color:#ffdbe0;border:1px solid #75404b;padding:12px 16px;border-radius:9px}.danger:hover{background:#62313d}.character-card .profile-line{margin:7px 0;color:var(--muted);font-size:.88rem}.skills-section{margin-top:4px}.skills-editor{min-height:150px!important;height:150px!important;resize:vertical!important;line-height:1.5}.field-help{display:block;color:var(--muted);font-size:.78rem;margin:-7px 0 14px}.stats-title{margin:20px 0 4px}.stats-help{margin:0 0 12px}.stats-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.stats-group{background:#20202e;border:1px solid #4b4670;border-radius:16px;padding:16px;box-shadow:0 0 20px rgba(198,108,255,.12)}.stats-group h4{margin:0 0 14px;font-size:.95rem}.stat-row{margin:12px 0}.stat-label{display:flex;justify-content:space-between;align-items:center;font-size:.86rem;margin-bottom:6px}.stat-label output{min-width:42px;text-align:center;background:#302842;color:#dfb8ff;border-radius:8px;padding:4px 8px;font-weight:bold}.stat-range{width:100%;margin:0;accent-color:var(--accent)}.character-stat-summary{margin-top:9px;color:#c9a9df;font-size:.78rem}.character-stat-summary b{color:#fff}@media(max-width:650px){.stats-panel{grid-template-columns:1fr}.skills-editor{min-height:180px!important;height:180px!important}}
+
+.story .icon{font-size:35px}.story h3{margin:14px 0 7px}.story p{color:var(--muted);font-size:.9rem}.status{display:inline-block;background:#2c2540;color:#d7b8ff;padding:5px 9px;border-radius:20px;font-size:.75rem}
+.role-layout{height:calc(100vh - 64px);display:grid;grid-template-columns:250px minmax(0,1fr) 280px}
+.side{background:rgba(20,20,30,.94);border-right:1px solid var(--line);padding:18px;overflow:auto}.right{border-left:1px solid var(--line);border-right:0}
+.side h3{margin-top:0}.character{width:100%;display:flex;align-items:center;gap:10px;background:var(--panel2);color:var(--text);padding:11px;margin:9px 0;border-radius:10px;text-align:left}.avatar{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:bold}
+.small{font-size:.8rem;color:var(--muted)}
+.add{width:100%;padding:11px;background:transparent;border:1px dashed #56546a;color:#c8c4d1;border-radius:10px;margin-top:8px}
+.chat{display:flex;flex-direction:column;min-width:0;background:rgba(12,12,19,.55)}
+.chat-head{padding:17px 22px;border-bottom:1px solid var(--line);background:rgba(24,24,35,.7)}.chat-head b{font-size:1.05rem}
+.messages{flex:1;overflow:auto;padding:24px;display:flex;flex-direction:column;gap:18px}
+.message{max-width:850px;background:var(--panel);border:1px solid #29293a;border-radius:12px;padding:15px 18px;line-height:1.6}.message.me{align-self:flex-end;background:#252039;border-color:#4b3566}.message.narrator{align-self:center;background:transparent;border-style:dashed;color:#d7d2df;text-align:center;font-style:italic;max-width:700px}
+.msg-name{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:bold;color:#dba7ff;margin-bottom:5px}.msg-time{font-size:.7rem;color:#777;margin-left:8px}
+.msg-avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid #4a4860;flex-shrink:0}
+.message.narrator .msg-name{justify-content:center}
+.composer{padding:14px 15px;border-top:1px solid var(--line);background:#15151f;display:grid;grid-template-columns:minmax(130px,170px) minmax(0,1fr) auto;gap:10px;align-items:stretch}.composer select,.composer textarea{background:#222230;border:1px solid var(--line);color:#fff;border-radius:10px;padding:11px 12px;min-width:0}.composer textarea{resize:none;height:54px}.send{background:var(--accent);color:#fff;padding:0 20px;border-radius:10px;font-weight:bold;min-height:54px}.image-upload-wrap{grid-column:1/-1;display:flex;align-items:center;gap:10px;min-height:0}.image-upload-label{background:#262635;border:1px dashed #55536a;color:#d8d3e1;border-radius:9px;padding:8px 11px;font-size:.82rem;cursor:pointer}.image-upload-label:hover{border-color:var(--accent)}#messageImageFile{display:none}.upload-preview{display:none;position:relative;align-items:center;gap:8px;color:var(--muted);font-size:.8rem}.upload-preview img{width:48px;height:48px;border-radius:8px;object-fit:cover;border:1px solid #4a4860}.remove-upload{background:#3a2c35;color:#ffb4c0;border:1px solid #65404d;border-radius:7px;padding:5px 8px}
+.info{background:var(--panel2);border-radius:12px;padding:14px;margin-bottom:13px}.info h4{margin:0 0 8px}.info p{margin:0;color:var(--muted);font-size:.88rem;line-height:1.5}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:20;place-items:center;padding:20px}.modal.show{display:grid}.modal-box{width:min(500px,100%);background:#1b1b28;border:1px solid #3b394b;border-radius:18px;padding:24px}.modal-box h2{margin-top:0}.modal-box input,.modal-box textarea,.modal-box select{width:100%;background:#262635;border:1px solid #464458;color:#fff;padding:13px;border-radius:10px;margin:7px 0 15px}.modal-box label{display:block;margin-top:2px}.row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}.row button{min-height:46px}.cancel{background:#2b2b38;color:#ddd;padding:12px 18px;border-radius:9px}
+.mobile-tabs{display:none}
+.drawer-overlay{display:none}
+@media(max-width:850px){.role-layout{grid-template-columns:1fr;height:auto;min-height:calc(100vh - 64px);position:relative;overflow:hidden}
+.side{position:fixed;top:64px;bottom:0;width:82%;max-width:320px;z-index:16;background:rgba(16,16,24,.98);transition:transform .25s ease;display:block}
+.side{left:0;transform:translateX(-105%)}
+.side.right{left:auto;right:0;transform:translateX(105%);border-left:1px solid var(--line);border-right:0}
+.side.open{transform:translateX(0)}
+.drawer-overlay{display:none;position:fixed;top:64px;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:15}
+.drawer-overlay.show{display:block}
+.mobile-tabs{display:flex;gap:8px;padding:10px 14px;background:rgba(15,15,22,.92);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:4}
+.mobile-tabs button{flex:1;background:#20202d;color:#ddd;border:1px solid var(--line);border-radius:9px;padding:10px;font-size:.82rem}
+.chat{min-height:calc(100vh - 64px)}.composer{position:sticky;bottom:0;grid-template-columns:1fr auto;gap:9px;padding:10px}.composer select{grid-column:1}.composer textarea{grid-column:1/-1;grid-row:2;height:58px}.composer .send{grid-column:2;grid-row:1;min-height:48px;padding:0 18px}.image-upload-wrap{grid-column:1/-1;grid-row:3}.messages{padding:14px 10px;gap:12px}.message{max-width:94%;padding:13px 14px}.topbar{padding:8px 10px;gap:6px;flex-wrap:wrap}.topbar>div:first-child{min-width:0}.brand{font-size:.92rem}.back-btn{padding:9px 11px;margin-right:5px}.nav{display:flex;gap:2px}.nav button{padding:9px 10px;font-size:.85rem}.hero{padding-top:20px}.story-actions{right:10px;bottom:10px;left:10px;justify-content:flex-end}.story-edit,.story-delete{padding:9px 11px}.story{padding-bottom:70px}.modal{padding:10px}.modal-box{padding:20px 16px;max-height:92vh;overflow:auto}.row{display:grid;grid-template-columns:1fr;gap:8px}.row button{width:100%}.editor-grid{grid-template-columns:1fr!important}.message-image{max-height:300px}}
+
+.rank-panel{margin-top:20px;padding:16px;border-radius:16px;background:#1c1c2b;border:1px solid #4b4670}
+.rank-row{display:flex;justify-content:space-between;margin-bottom:10px}
+.rank-bar{width:100%;height:12px;background:#2b2b3d;border-radius:999px;overflow:hidden}
+.rank-fill{height:100%;width:0%;background:linear-gradient(90deg,#6d7cff,#c66cff);transition:.3s}
+.rank-f{color:#999}.rank-e{color:#7f7f7f}.rank-d{color:#59c3ff}.rank-c{color:#5dff8d}
+.rank-b{color:#ffd95d}.rank-a{color:#ff9d3d}.rank-s{color:#ff4e4e}.rank-ss{color:#ff66ff}
+.rank-sss{color:#fff;text-shadow:0 0 10px #fff,0 0 20px #ff66ff,0 0 30px #ff66ff}
+
+
+    .modal-content,.editor-modal,.character-editor,.modal{
+        max-height:90vh !important;
+        overflow-y:auto !important;
+        -webkit-overflow-scrolling:touch !important;
+    }
+    .stats-panel,.rank-panel{
+        display:block !important;
+        visibility:visible !important;
+    }
+    
+
+/* UI polish v10 */
+.nav{display:flex;gap:6px}.nav button{font-size:.95rem;transition:.18s}.topbar{gap:12px}.backup-actions{display:flex;gap:6px}.backup-actions button{background:#20202d;color:#d8d4df;border:1px solid #343447;border-radius:9px;padding:8px 10px}.backup-actions button:hover{border-color:var(--accent);color:#fff}.search-box{width:100%;max-width:720px;display:block;margin:0 auto 22px;background:#171722;border:1px solid #343447;color:#fff;border-radius:13px;padding:13px 15px;outline:none}.search-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(198,108,255,.12)}.story{overflow:hidden}.story::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.025),transparent 45%)}
+.story-cover{width:100%;height:150px;object-fit:cover;border-radius:12px;border:1px solid #3b394b;margin:-2px 0 15px;display:block}.story.has-cover{padding-top:14px}.story-cover-placeholder{height:150px;border-radius:12px;background:linear-gradient(135deg,#29263a,#171722);display:grid;place-items:center;font-size:2.8rem;margin:-2px 0 15px;border:1px dashed #45425a;color:#8e889d}.story h3{padding-right:80px}.character-card{min-height:245px}.character-card .character-image{width:92px;height:92px;border-radius:18px}.character-stat-summary{margin-top:10px;padding-top:10px;border-top:1px solid #303044;color:#cbc7d3;font-size:.86rem;line-height:1.7}.modal-box{box-shadow:0 25px 80px rgba(0,0,0,.45)}.modal-box label{display:block;color:#d7d2df;font-size:.85rem;font-weight:600;margin-top:8px}.modal-box input,.modal-box textarea,.modal-box select{outline:none;transition:.15s}.modal-box input:focus,.modal-box textarea:focus,.modal-box select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(198,108,255,.1)}.editor-section{background:#151520;border:1px solid #303044;border-radius:13px;padding:14px;margin:14px 0}.editor-section-title{margin:0 0 10px;font-size:1rem}.field-help{line-height:1.45}.story-edit,.story-delete{position:relative}.mobile-tabs{display:none}
+@media(max-width:850px){.topbar{height:auto;min-height:64px;padding:9px 10px;flex-wrap:wrap}.brand{font-size:1.05rem}.nav{order:3;width:100%;justify-content:center;border-top:1px solid #29293a;padding-top:7px}.backup-actions{margin-left:auto}.backup-actions button{font-size:0;padding:8px 10px}.backup-actions button:first-child::before{content:'⬇️';font-size:1rem}.backup-actions button:nth-child(2)::before{content:'⬆️';font-size:1rem}.home{padding:28px 14px}.hero{padding:18px 6px 30px}.stories{grid-template-columns:1fr;gap:14px}.story{min-height:205px;padding:18px}.story h3{font-size:1.35rem}.role-layout{height:calc(100vh - 104px)}.mobile-tabs{display:flex;gap:8px;padding:8px;border-bottom:1px solid var(--line);background:#15151f}.mobile-tabs button{flex:1;background:#222230;color:#ddd;border:1px solid #353548;border-radius:9px;padding:9px}.editor-grid{grid-template-columns:1fr!important}.modal-box{padding:18px}.row{flex-wrap:wrap}.row button{flex:1;min-width:110px}.character-card{min-height:220px}}
+.unified-stats{display:block!important}.unified-stats .stats-group{width:100%;margin:0}.unified-stats .stat-row{margin:14px 0}@media(max-width:650px){.unified-stats .stats-group{padding:14px}}
+/* Mejoras UI v11: animación de apertura de modales y estado vacío de campos condicionales */
+.modal.show .modal-box{animation:modalPop .18s ease}
+@keyframes modalPop{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:none}}
+#charExtraFields,#editExtraFields{transition:opacity .15s ease}
+
+/* ===== ✨ ROLEVERSE v12 — diseño cinematográfico ===== */
+#app{position:relative;z-index:1}
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
+h1,h2,h3,.brand,.stats-title,.stats-group h4{font-family:'Cinzel',Georgia,'Times New Roman',serif;letter-spacing:.5px}
+.hero h1{background:linear-gradient(90deg,#f4f1f8 10%,#c66cff 35%,#6d7cff 60%,#f4f1f8 90%);background-size:280% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:heroShimmer 9s linear infinite}
+@keyframes heroShimmer{to{background-position:280% 0}}
+@media (prefers-reduced-motion: reduce){.hero h1{animation:none}}
+.hero .primary{font-size:1.05rem;padding:15px 26px;margin-top:26px}
+.primary,.send{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 6px 20px rgba(198,108,255,.22);transition:transform .18s,box-shadow .18s}
+.primary:hover,.send:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(198,108,255,.38)}
+.story{box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.story:hover{box-shadow:0 16px 36px rgba(109,124,255,.16),0 0 0 1px rgba(198,108,255,.4)}
+.story.has-cover:hover .story-cover{transform:scale(1.05)}
+.story-cover{transition:transform .35s ease}
+.story-meta{display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:.8rem;margin-top:6px}
+.character-card:hover{box-shadow:0 16px 36px rgba(198,108,255,.16),0 0 0 1px rgba(198,108,255,.4)}
+.msg-avatar{width:26px;height:26px;border-radius:50%;border:2px solid rgba(198,108,255,.55);object-fit:cover;box-shadow:0 0 8px rgba(198,108,255,.25)}
+.message{animation:msgIn .22s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.message.me{border-left:3px solid var(--accent)}
+.message.narrator{opacity:.92}
+.dice-btn{background:#262635;border:1px dashed #55536a;color:#d8d3e1;border-radius:9px;padding:8px 12px;font-size:.85rem;cursor:pointer;transition:.18s;white-space:nowrap}
+.dice-btn:hover{border-color:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(198,108,255,.25)}
+.message.dice-roll{align-self:center;background:linear-gradient(145deg,#221a38,#171226);border:1px solid #5b3d8a;text-align:center;min-width:200px}
+.message.dice-roll .dice-detail{font-variant-numeric:tabular-nums;letter-spacing:.4px;color:#e9defc}
+.dice-result-box{margin-top:14px;padding:16px;border-radius:13px;background:linear-gradient(145deg,#221a38,#171226);border:1px solid #5b3d8a;text-align:center;font-size:1.3rem;font-weight:800;color:#e9defc}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#3a3a52;border-radius:8px;border:2px solid #0d0d14}
+::-webkit-scrollbar-thumb:hover{background:#56567a}
+::selection{background:rgba(198,108,255,.35)}
+
+/* ===== 🚀 ROLEVERSE v13 ===== */
+.status-activa{background:rgba(93,255,141,.12);color:#5dff8d;border:1px solid rgba(93,255,141,.35)}
+.status-pausada{background:rgba(255,217,93,.12);color:#ffd95d;border:1px solid rgba(255,217,93,.35)}
+.status-finalizada{background:rgba(170,167,183,.12);color:#aaa7b7;border:1px solid rgba(170,167,183,.35)}
+.chat-search{margin:12px 14px 0;display:block;background:#171722;border:1px solid #343447;color:#fff;border-radius:11px;padding:10px 13px;outline:none}
+.chat-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(198,108,255,.12)}
+.idea-btn{margin:0 0 14px}
+
+/* ===== 📱 ROLEVERSE v14 — UI móvil cómoda ===== */
+@media(max-width:850px){
+ .story{padding-bottom:18px;display:flex;flex-direction:column}
+ .story-actions{position:static;left:auto;right:auto;bottom:auto;margin-top:16px;gap:10px;width:100%}
+ .story-edit,.story-delete{flex:1;min-height:46px;font-size:.88rem;display:flex;align-items:center;justify-content:center}
+ .story-meta{display:block;margin:6px 0 2px}
+ .status{margin-top:4px;display:inline-block}
+ .story h3{padding-right:0}
+ .hero{padding-top:28px}
+ .hero p{padding:0 6px}
+ .backup-actions button{min-width:42px;min-height:42px;display:flex;align-items:center;justify-content:center}
+ .nav button{min-height:42px}
+ .back-btn{min-height:42px}
+ .search-box{padding:14px 15px;font-size:1rem}
+ .character-card .story-edit{min-height:44px;width:100%;margin-top:10px}
+ .character-card{display:flex;flex-direction:column}
+ .composer select,.composer textarea{font-size:1rem}
+ .image-upload-label{padding:10px 13px;font-size:.85rem}
+ .stories{gap:16px}
+ .modal-box label{margin-top:12px}
+ .modal-box input,.modal-box textarea,.modal-box select{min-height:44px}
+ .chat-search{margin:10px 10px 0}
+}
+@media(max-width:420px){
+ .hero h1{font-size:2rem}
+ .story-cover,.story-cover-placeholder{height:120px}
+ .story-edit,.story-delete{font-size:.82rem;padding:9px 8px}
+}
+
+.empty-chat{margin:auto;text-align:center;color:var(--muted);padding:30px 20px;line-height:1.7;font-size:.98rem}
+.empty-chat .small{display:inline-block;margin-top:6px;color:#78748a}
+.messages{display:flex;flex-direction:column}
+</style>
+
+<style>
+/* Clases estructurales para mantener el HTML limpio */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.textarea-md{width:100%;height:70px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:6px 0 13px}
+.textarea-lg{width:100%;height:150px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:6px 0 13px}
+.textarea-scene{width:100%;height:100px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:7px 0 15px}
+.modal-wide{max-height:90vh;overflow:auto;width:min(720px,100%)}
+.checkbox-label{display:flex!important;align-items:center;gap:8px;margin:4px 0 15px;cursor:pointer}
+.field-full{grid-column:1/-1}
+@media(max-width:850px){.form-grid{grid-template-columns:1fr}}
+</style>
+
+<style>
+/* ===== ROLEVERSE — chat responsive fix ===== */
+.message{
+  width:fit-content;
+  max-width:100%;
+  min-width:0;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  white-space:pre-wrap;
+}
+.message *{max-width:100%;}
+.message-image{max-width:100%;height:auto;}
+
+@media(max-width:850px){
+  .role-layout{width:100%;max-width:100vw;overflow:hidden;}
+  .chat{width:100%;min-width:0;max-width:100%;overflow:hidden;}
+  .chat-head{padding:11px 14px;}
+  .chat-head b{font-size:.98rem;}
+  .chat-search{margin:8px 10px 0;width:calc(100% - 20px);max-width:none;padding:10px 12px;font-size:.92rem;}
+  .messages{width:100%;max-width:100%;padding:12px 9px;gap:10px;overflow-x:hidden;}
+  .message{max-width:92%;padding:10px 12px;font-size:.93rem;line-height:1.5;border-radius:11px;}
+  .msg-name{font-size:.78rem;margin-bottom:4px;}
+  .msg-time{font-size:.68rem;}
+  .composer{
+    width:100%;
+    max-width:100%;
+    padding:8px 9px;
+    gap:7px;
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+  .composer select{font-size:.92rem;padding:9px 10px;height:44px;}
+  .composer textarea{height:52px;min-height:52px;font-size:.92rem;padding:10px;}
+  .composer .send{min-height:44px;height:44px;padding:0 15px;font-size:.92rem;}
+  .image-upload-wrap{gap:7px;}
+  .image-upload-label{padding:8px 10px;font-size:.78rem;}
+  .upload-preview img{width:40px;height:40px;}
+}
+
+@media(max-width:420px){
+  .chat-head{padding:9px 12px;}
+  .chat-head b{font-size:.92rem;}
+  .chat-search{font-size:.86rem;}
+  .messages{padding:10px 7px;gap:8px;}
+  .message{max-width:94%;padding:9px 10px;font-size:.88rem;line-height:1.48;}
+  .composer{padding:7px;}
+  .composer select{height:42px;font-size:.86rem;}
+  .composer textarea{height:48px;min-height:48px;font-size:.88rem;}
+  .composer .send{height:42px;min-height:42px;padding:0 13px;font-size:.88rem;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:8px"><div class="brand">ROLE<span>VERSE</span></div>
+  </div><div class="nav">
+    <button class="active" onclick="showScreen('home')">Historias</button>
+    <button onclick="showScreen('characters')">Personajes</button>
+  </div>
+
+</header>
+
+<section id="home" class="screen active">
+<div class="home">
+  <div class="hero">
+    <h1>Tu mundo. Sus historias.</h1>
+    <p>Un espacio privado para construir personajes, universos y aventuras entre dos personas.</p>
+    <button class="primary" onclick="openStoryModal()">+ Crear nueva historia</button>
+  </div>
+  <input id="storySearch" class="search-box" type="search" placeholder="Buscar historia por nombre o género..." aria-label="Buscar historias" oninput="renderStories()">
+  <div id="stories" class="stories"></div>
+</div>
+</section>
+
+
+<section id="characters" class="screen">
+<div class="home">
+  <div class="hero" style="padding-bottom:28px">
+    <h1 style="font-size:clamp(2rem,5vw,3.5rem)">Personajes</h1>
+    <p>Crea y administra los personajes que utilizarán en sus historias.</p>
+    <button class="primary" onclick="openCharacterModal()">+ Crear personaje</button>
+  </div>
+  <input id="characterSearch" class="search-box" type="search" placeholder="Buscar personaje por nombre..." aria-label="Buscar personajes" oninput="renderCharacterCards()">
+  <div id="characterCards" class="stories"></div>
+</div>
+</section>
+
+<section id="roleplay" class="screen">
+<div class="role-layout">
+<aside class="side" id="sidePanel">
+  <h3>Personajes</h3>
+  <div id="characterList"></div>
+  <button class="add" onclick="openCharacterModal()">+ Crear personaje</button>
+</aside>
+
+<main class="chat">
+  <div class="mobile-tabs">
+    <button onclick="toggleDrawer('sidePanel')">👥 Personajes</button>
+    <button onclick="toggleDrawer('infoPanel')">📖 Historia</button>
+  </div>
+  <div class="chat-head"><b id="storyTitle">Selecciona una historia</b><div class="small" id="storyGenre">Roleplay privado</div></div>
+  <input id="msgSearch" class="search-box chat-search" type="search" placeholder="🔍 Buscar en la conversación..." aria-label="Buscar en la conversación" oninput="renderRoleplay()">
+  <div id="messages" class="messages"></div>
+  <div class="composer">
+    <select id="speaker" aria-label="Quién habla"></select>
+    <textarea id="messageInput" placeholder="Escribe lo que ocurre en la historia..." aria-label="Mensaje"></textarea>
+    <button class="send" onclick="sendMessage()">Enviar</button>
+    <div class="image-upload-wrap">
+      <label class="image-upload-label" for="messageImageFile">🖼️ Añadir imagen</label>
+      <input id="messageImageFile" type="file" accept="image/*">
+      <div id="messageImagePreview" class="upload-preview"><img id="messageImagePreviewImg" alt="Vista previa"><span>Imagen lista para enviar</span><button type="button" class="remove-upload" onclick="clearMessageImage()">✕</button></div>
+    </div>
+  </div>
+</main>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawers()"></div>
+<aside class="side right" id="infoPanel">
+  <h3>Historia</h3>
+  <div class="info"><h4>Capítulo</h4><p id="chapter">Capítulo 1 — El comienzo</p></div>
+  <div class="info"><h4>Ubicación actual</h4><p id="locationInfo">Sin definir</p></div>
+  <div class="info"><h4>Notas</h4><p id="notes">Aquí podremos guardar información importante del universo.</p></div>
+   <div class="info"><h4>Escenario</h4><p id="scenarioInfo">Sin definir</p></div>
+</aside>
+</div>
+</section>
+</div>
+
+<div id="storyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="storyModalTitle">
+<div class="modal-box">
+<h2 id="storyModalTitle">Nueva historia</h2>
+<input id="newStoryName" placeholder="Nombre de la historia" aria-label="Nombre de la historia">
+<input id="newStoryGenre" placeholder="Género (Romance, Fantasía, etc.)" aria-label="Género de la historia">
+<label class="upload-label">Imagen de portada (opcional)</label>
+<input id="newStoryImageUrl" type="url" placeholder="URL de imagen (https://...)">
+<div class="file-row"><input id="newStoryImageFile" type="file" accept="image/*"><button type="button" class="clear-image" onclick="clearNewStoryImage()">Quitar imagen</button></div>
+<img id="newStoryImagePreview" class="image-preview" alt="Vista previa de portada">
+<div class="row"><button class="cancel" onclick="closeModals()">Cancelar</button><button class="primary" onclick="createStory()">Crear historia</button></div>
+</div>
+</div>
+
+<div id="characterModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="characterModalTitle">
+<div class="modal-box modal-wide">
+<h2 id="characterModalTitle">Nuevo personaje</h2>
+<label class="upload-label" for="charType">Tipo de personaje</label>
+<select id="charType" aria-label="Tipo de personaje" onchange="toggleCharacterTypeFields('charType','charExtraFields')"><option value="character">Personaje</option><option value="narrator">Narrador</option></select>
+<input id="charName" placeholder="Nombre" aria-label="Nombre del personaje">
+<label class="upload-label">Imagen del personaje (opcional)</label><input id="charImageUrl" type="url" placeholder="URL de imagen (https://...)"><div class="file-row"><input id="charImageFile" type="file" accept="image/*"><button type="button" class="clear-image" onclick="clearNewCharacterImage()">Quitar imagen</button></div><img id="charImagePreview" class="image-preview" alt="Vista previa de la imagen">
+<div id="charExtraFields">
+<input id="charInitial" maxlength="2" placeholder="Inicial o símbolo de respaldo (N, ✦, etc.)" aria-label="Inicial o símbolo de respaldo">
+<label class="checkbox-label"><input id="charMine" type="checkbox" style="width:auto;margin:0"> Es tu personaje (tus mensajes se alinean a la derecha)</label>
+<div class="editor-grid form-grid">
+<div><label>Peso</label><input id="newCharWeight" placeholder="Ej. 70 kg"></div>
+<div><label>Altura</label><input id="newCharHeight" placeholder="Ej. 1.75 m"></div>
+<div class="field-full"><label>Género</label><input id="newCharGender"></div>
+</div>
+<label>Gustos generales</label><textarea id="newCharLikes" class="textarea-md"></textarea>
+<label>Gustos sexuales</label><textarea id="newCharSexualLikes" class="textarea-md"></textarea>
+<div class="skills-section">
+<label>Habilidades y capacidades</label>
+<textarea id="newCharSkills" class="skills-editor" placeholder="Escribe las habilidades del personaje...
+Ejemplo:
+• Manipulación de sombras
+• Combate cuerpo a cuerpo
+• Regeneración
+• Estrategia avanzada"></textarea>
+<span class="field-help">Puedes escribir una habilidad por línea o separarlas con comas.</span>
+</div>
+<h3 class="stats-title">Estadísticas del personaje</h3>
+<p class="field-help stats-help">Ajusta cada atributo de 0 a 100. 0 = inexistente, 50 = promedio, 100 = nivel extraordinario.</p>
+<div class="stats-panel unified-stats">
+  <div class="stats-group">
+    <h4>📊 Estadísticas</h4>
+    <p class="field-help" style="margin-top:-6px">Todos los atributos pertenecen a una única clasificación general. Cada valor va de 0 a 100.</p>
+    <div class="stat-row"><div class="stat-label"><span>Fuerza</span><output id="newStatStrengthValue">5</output></div><input id="newStatStrength" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateNewStatValue('newStatStrength','newStatStrengthValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Velocidad</span><output id="newStatSpeedValue">5</output></div><input id="newStatSpeed" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateNewStatValue('newStatSpeed','newStatSpeedValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Resistencia</span><output id="newStatEnduranceValue">5</output></div><input id="newStatEndurance" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateNewStatValue('newStatEndurance','newStatEnduranceValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Inteligencia</span><output id="newStatIntelligenceValue">5</output></div><input id="newStatIntelligence" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateNewStatValue('newStatIntelligence','newStatIntelligenceValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Voluntad</span><output id="newStatWillpowerValue">5</output></div><input id="newStatWillpower" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateNewStatValue('newStatWillpower','newStatWillpowerValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Percepción</span><output id="newStatPerceptionValue">5</output></div><input id="newStatPerception" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateNewStatValue('newStatPerception','newStatPerceptionValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Técnica</span><output id="newStatTechniqueValue">5</output></div><input id="newStatTechnique" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateNewStatValue('newStatTechnique','newStatTechniqueValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Carisma</span><output id="newStatCharismaValue">5</output></div><input id="newStatCharisma" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateNewStatValue('newStatCharisma','newStatCharismaValue')"></div>
+  </div>
+</div>
+<div class="rank-panel">
+<h4>🏆 Clasificación</h4>
+<div class="rank-row"><span>Poder General</span><strong id="newPowerValue">5</strong></div>
+<div class="rank-row"><span>Rango Global</span><strong id="newRankValue">F</strong></div>
+<div class="rank-bar"><div id="newRankFill" class="rank-fill"></div></div><p class="field-help" style="margin:10px 0 0">La clasificación se calcula únicamente a partir del promedio de todas las estadísticas.</p></div>
+<label style="display:block;margin-top:14px">Historia / trasfondo</label>
+<textarea id="newCharHistory" class="textarea-lg"></textarea>
+</div>
+<div class="row"><button class="cancel" onclick="closeModals()">Cancelar</button><button class="primary" onclick="createCharacter()">Crear</button></div>
+</div>
+</div>
+
+
+<div id="editorModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="editorModalTitle">
+<div class="modal-box modal-wide">
+<h2 id="editorModalTitle">Editar personaje</h2>
+<input id="editCharIndex" type="hidden">
+<div class="editor-grid form-grid">
+<div><label>Nombre</label><input id="editName"></div>
+<div><label>Tipo</label><select id="editType" onchange="toggleCharacterTypeFields('editType','editExtraFields')"><option value="character">Personaje</option><option value="narrator">Narrador</option></select></div>
+<div class="field-full"><label>Imagen del personaje</label><input id="editImageUrl" type="url" placeholder="URL de la imagen (https://...)"><div class="file-row"><input id="editImageFile" type="file" accept="image/*"><button type="button" class="clear-image" onclick="clearEditCharacterImage()">Quitar imagen</button></div><img id="editImagePreview" class="image-preview" alt="Vista previa"></div>
+</div>
+<div id="editExtraFields">
+<div class="editor-grid form-grid">
+<div><label>Inicial / avatar de respaldo</label><input id="editInitial" maxlength="3" placeholder="N, ✦, etc."></div>
+<div><label>Peso</label><input id="editWeight" placeholder="Ej. 70 kg"></div>
+<div><label>Altura</label><input id="editHeight" placeholder="Ej. 1.75 m"></div>
+<div><label>Género</label><input id="editGender"></div>
+</div>
+<label class="checkbox-label"><input id="editMine" type="checkbox" style="width:auto;margin:0"> Es tu personaje (tus mensajes se alinean a la derecha)</label>
+<label>Gustos generales</label><textarea id="editLikes" class="textarea-md"></textarea>
+<label>Gustos sexuales</label><textarea id="editSexualLikes" class="textarea-md"></textarea>
+<div class="skills-section">
+<label>Habilidades y capacidades</label>
+<textarea id="editSkills" class="skills-editor" placeholder="Escribe las habilidades del personaje...
+Ejemplo:
+• Manipulación de sombras
+• Combate cuerpo a cuerpo
+• Regeneración
+• Estrategia avanzada"></textarea>
+<span class="field-help">Puedes escribir una habilidad por línea o separarlas con comas.</span>
+</div>
+<h3 class="stats-title">Estadísticas del personaje</h3>
+<p class="field-help stats-help">Ajusta cada atributo de 0 a 100. 0 = inexistente, 50 = promedio, 100 = nivel extraordinario.</p>
+<div class="stats-panel unified-stats">
+  <div class="stats-group">
+    <h4>📊 Estadísticas</h4>
+    <p class="field-help" style="margin-top:-6px">Todos los atributos pertenecen a una única clasificación general. Cada valor va de 0 a 100.</p>
+    <div class="stat-row"><div class="stat-label"><span>Fuerza</span><output id="statStrengthValue">5</output></div><input id="statStrength" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateStatValue('statStrength','statStrengthValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Velocidad</span><output id="statSpeedValue">5</output></div><input id="statSpeed" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateStatValue('statSpeed','statSpeedValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Resistencia</span><output id="statEnduranceValue">5</output></div><input id="statEndurance" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateStatValue('statEndurance','statEnduranceValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Inteligencia</span><output id="statIntelligenceValue">5</output></div><input id="statIntelligence" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateStatValue('statIntelligence','statIntelligenceValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Voluntad</span><output id="statWillpowerValue">5</output></div><input id="statWillpower" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateStatValue('statWillpower','statWillpowerValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Percepción</span><output id="statPerceptionValue">5</output></div><input id="statPerception" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateStatValue('statPerception','statPerceptionValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Técnica</span><output id="statTechniqueValue">5</output></div><input id="statTechnique" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateStatValue('statTechnique','statTechniqueValue')"></div>
+    <div class="stat-row"><div class="stat-label"><span>Carisma</span><output id="statCharismaValue">5</output></div><input id="statCharisma" class="stat-range" type="range" min="0" max="100" value="5" oninput="updateStatValue('statCharisma','statCharismaValue')"></div>
+  </div>
+</div>
+<div class="rank-panel">
+<h4>🏆 Clasificación</h4>
+<div class="rank-row"><span>Poder General</span><strong id="powerValue">5</strong></div>
+<div class="rank-row"><span>Rango Global</span><strong id="rankValue">F</strong></div>
+<div class="rank-bar"><div id="rankFill" class="rank-fill"></div></div><p class="field-help" style="margin:10px 0 0">La clasificación se calcula únicamente a partir del promedio de todas las estadísticas.</p></div>
+<label style="display:block;margin-top:14px">Historia / trasfondo</label>
+<textarea id="editHistory" class="textarea-lg"></textarea>
+</div>
+<div class="row"><button class="danger" onclick="deleteCharacter()">Eliminar personaje/rol</button><button class="cancel" onclick="closeModals()">Cancelar</button><button class="primary" onclick="saveCharacterEditor()">Guardar cambios</button></div>
+</div>
+</div>
+
+
+
+
+<div id="storyEditorModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="storyEditorModalTitle">
+<div class="modal-box">
+<h2 id="storyEditorModalTitle">Editar historia</h2>
+<input id="editStoryId" type="hidden">
+<label>Nombre</label>
+<input id="editStoryName" placeholder="Nombre de la historia">
+<label>Género</label>
+<input id="editStoryGenre" placeholder="Fantasía, Romance, Drama...">
+<label class="upload-label">Imagen de portada</label>
+<input id="editStoryImageUrl" type="url" placeholder="URL de imagen (https://...)">
+<div class="file-row"><input id="editStoryImageFile" type="file" accept="image/*"><button type="button" class="clear-image" onclick="clearEditStoryImage()">Quitar imagen</button></div>
+<img id="editStoryImagePreview" class="image-preview" alt="Vista previa de portada">
+<label>Capítulo actual</label>
+<input id="editStoryChapter" placeholder="Capítulo 1 — El comienzo">
+<label>Ubicación actual</label>
+<input id="editStoryLocation" placeholder="Lugar donde ocurre la escena">
+<label>Estado de la historia</label>
+<select id="editStoryStatus" style="width:100%;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:6px 0 13px"><option value="Activa">Activa</option><option value="Pausada">Pausada</option><option value="Finalizada">Finalizada</option></select>
+<label>Escenario / descripción</label>
+<textarea id="editStoryScenario" class="textarea-scene" placeholder="Describe qué está ocurriendo en este momento..."></textarea>
+<button type="button" class="dice-btn idea-btn" onclick="generateScenarioIdea('editStoryScenario')">✨ Generar idea de escena</button>
+<label>Notas</label>
+<textarea id="editStoryNotes" style="width:100%;height:100px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:6px 0 13px"></textarea>
+<div class="row">
+<button class="cancel" onclick="closeModals()">Cancelar</button>
+<button class="cancel" onclick="exportStoryText()">📄 Exportar texto</button>
+<button class="primary" onclick="saveStoryEditor()">Guardar cambios</button>
+</div>
+</div>
+</div>
+
+<script>
+/* ============================================================
+   ROLEVERSE — Arquitectura modular en un único archivo
+   CONFIGURACIÓN → ESTADO → UTILIDADES → PERSISTENCIA →
+   NAVEGACIÓN → PERSONAJES → HISTORIAS → ROLEPLAY → IMÁGENES
+   → RENDERIZADO → INICIALIZACIÓN
+   ============================================================ */
+
+/* ---------- CONFIGURACIÓN ---------- */
+const $=id=>document.getElementById(id);
+const STAT_CONFIG=[
+  {key:'Fuerza',id:'Strength',label:'Fuerza'},
+  {key:'Velocidad',id:'Speed',label:'Velocidad'},
+  {key:'Resistencia',id:'Endurance',label:'Resistencia'},
+  {key:'Inteligencia',id:'Intelligence',label:'Inteligencia'},
+  {key:'Voluntad',id:'Willpower',label:'Voluntad'},
+  {key:'Percepción',id:'Perception',label:'Percepción'},
+  {key:'Técnica',id:'Technique',label:'Técnica'},
+  {key:'Carisma',id:'Charisma',label:'Carisma'}
+];
+const STAT_DEFAULT=5;
+const DEFAULT_STORY={chapter:'Capítulo 1 — El comienzo',location:'Sin definir',scenario:'Sin definir',notes:'Aquí podremos guardar información importante del universo.'};
+const SCENE_IDEAS=[
+ 'Una tormenta obliga a ambos a refugiarse en la misma posada, y solo queda una habitación libre.',
+ 'Durante un festival de linternas, un mensaje oculto en una de ellas cambia el rumbo de la noche.',
+ 'Un objeto olvidado en el bolsillo de un abrigo comienza a brillar al caer la noche.',
+ 'Dos personas quedan encerradas por accidente en una biblioteca antigua al anochecer.',
+ 'Una carta sin remitente llega con instrucciones imposibles de ignorar.',
+ 'El barco que debía partir se retrasa... y con él, una decisión pendiente desde hace años.',
+ 'En el mercado negro aparece a la venta algo que jamás debió salir de su colección.',
+ 'Una apuesta en la taberna termina convirtiéndose en una travesía de madrugada.',
+ 'El reflejo del espejo muestra una habitación distinta a la que están pisando.',
+ 'Una melodía que nadie más escucha guía a uno de los dos hasta un secreto antiguo.',
+ 'Amanece y, por alguna razón, todo el pueblo está desierto.',
+ 'Un desconocido entrega un paquete diciendo: «Esto les pertenecía antes de que olvidaran».',
+ 'La niebla del acantilado revela un sendero que no aparece en ningún mapa.',
+ 'Durante un eclipse, las sombras empiezan a moverse con voluntad propia.',
+ 'Un sueño compartido deja una marca física en ambos al despertar.',
+ 'El faro que lleva años apagado se enciende solo esta noche.',
+ 'En el jardín abandonado florece, por primera vez en un siglo, una flor imposible.',
+ 'Una figura herida aparece en la puerta pidiendo protección... y asegura conocer el pasado de uno de los dos.',
+ 'El reloj de la torre se detiene exactamente cuando se cruzan las miradas.',
+ 'Un mapache ladronzuelo roba el anillo que uno llevaba escondido, empezando una persecución absurda por la ciudad.'
+];
+
+/* ---------- COLECCIONES ---------- */
+// Equivalente ligero a ArrayList: conserva la compatibilidad nativa de Array.
+class Collection extends Array {
+  add(item){ this.push(item); return item; }
+  addAll(items=[]){ this.push(...items); return this; }
+  get(index){ return this[index]; }
+  getById(id){ return this.find(item=>item?.id===id); }
+  updateById(id,changes={}){ const item=this.getById(id); if(item) Object.assign(item,changes); return item; }
+  removeById(id){ const index=this.findIndex(item=>item?.id===id); if(index!==-1) return this.splice(index,1)[0]; return null; }
+  clear(){ this.length=0; }
+  containsId(id){ return this.some(item=>item?.id===id); }
+  search(text,fields=['name']){ const q=String(text||'').trim().toLowerCase(); if(!q)return this.slice(); return this.filter(item=>fields.some(field=>String(item?.[field]??'').toLowerCase().includes(q))); }
+  static from(items=[]){ const collection=new Collection(); collection.addAll(Array.from(items||[])); return collection; }
+}
+
+function hydrateCollections(){
+  state.characters=Collection.from(state.characters);
+  state.stories=Collection.from(state.stories);
+  state.stories.forEach(story=>{story.messages=Collection.from(story.messages);});
+}
+
+/* ---------- ESTADO / MIGRACIÓN ---------- */
+const state=JSON.parse(localStorage.getItem('roleverseData'))||{
+ stories:[{id:1,name:'Una historia por comenzar',genre:'Fantasía · Romance',...DEFAULT_STORY,messages:[{id:null,speaker:'Narrador',type:'narrator',text:'Toda gran historia comienza con una sola decisión.',time:'Ahora'}]}],
+ characters:[{name:'Nyx',initial:'N',type:'character',mine:true},{name:'Amiga',initial:'A',type:'character',mine:false},{name:'Narrador',initial:'✦',type:'narrator',mine:false}],
+ currentStory:1
+};
+function makeId(prefix){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9)}
+function defaultStats(){return Object.fromEntries(STAT_CONFIG.map(s=>[s.key,STAT_DEFAULT]))}
+function normalizeCharacter(c){
+  c.id??=makeId('char'); c.type??='character'; c.mine??=false;
+  c.appearance??={}; c.profile??={}; c.preferences??={}; c.abilities??=c.skills??[]; c.stats??={};
+  c.appearance.initial??=c.initial??c.name?.[0]??'✦'; c.appearance.image??=c.image??''; c.appearance.imageUrl??=c.imageUrl??'';
+  c.profile.weight??=c.weight??'Sin definir'; c.profile.height??=c.height??'Sin definir'; c.profile.gender??=c.gender??'Sin definir';
+  c.preferences.likes??=c.likes??'Sin definir'; c.preferences.sexualLikes??=c.sexualLikes??'Sin definir';
+  STAT_CONFIG.forEach(s=>c.stats[s.key]??=STAT_DEFAULT);
+  c.history??='';
+  delete c.initial;delete c.image;delete c.imageUrl;delete c.weight;delete c.height;delete c.gender;delete c.likes;delete c.sexualLikes;delete c.skills;
+  return c;
+}
+function normalizeStory(s){
+  Object.assign(s,DEFAULT_STORY,s); s.messages??=[]; s.image??='';s.imageUrl??='';s.status??='Activa';s.messages.forEach(normalizeMessage);return s;
+}
+function normalizeMessage(m){m.id??=makeId('msg');return m}
+state.characters.forEach(normalizeCharacter);state.stories.forEach(s=>{normalizeStory(s);s.messages.forEach(m=>{if(!m.characterId){const c=state.characters.find(x=>x.name===m.speaker);if(c)m.characterId=c.id}})});
+hydrateCollections();
+
+/* ---------- UTILIDADES ---------- */
+function characterStats(c){return STAT_CONFIG.map(s=>Number(c?.stats?.[s.key])||0)}
+function powerOf(c){const v=characterStats(c);return Math.round(v.reduce((a,b)=>a+b,0)/v.length)}
+function getRank(value){if(value>=95)return'SSS';if(value>=90)return'SS';if(value>=80)return'S';if(value>=65)return'A';if(value>=50)return'B';if(value>=35)return'C';if(value>=20)return'D';if(value>=10)return'E';return'F'}
+function characterName(c){return c?.name||'Sin nombre'}
+function characterAvatar(c,cls='avatar',size=''){const src=c?.appearance?.imageUrl||c?.appearance?.image;if(src)return `<img class="${cls}" ${size?`style="${size}"`:''} src="${escapeAttr(src)}" alt="">`;const fallbackCls=cls==='character-image'?'avatar':cls;const fallbackSize=cls==='character-image'?'width:52px;height:52px;font-size:1.1rem':size;return `<span class="${fallbackCls}" ${fallbackSize?`style="${fallbackSize}"`:''}>${escapeHtml(c?.appearance?.initial||characterName(c)[0])}</span>`}
+function createButton(text,className,handler){const b=document.createElement('button');b.className=className;b.textContent=text;b.onclick=handler;return b}
+function escapeHtml(t){return String(t??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[x]))}
+function escapeAttr(t){return escapeHtml(t)}
+function format(t){return escapeHtml(String(t??'')).replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\*(.*?)\*/g,'<i>$1</i>').replace(/\n/g,'<br>')}
+function timeAgo(ts){if(!ts)return'sin actividad';const m=Math.floor((Date.now()-ts)/60000);if(m<1)return'hace instantes';if(m<60)return'hace '+m+(m===1?' minuto':' minutos');const h=Math.floor(m/60);if(h<24)return'hace '+h+(h===1?' hora':' horas');const d=Math.floor(h/24);if(d<30)return'hace '+d+(d===1?' día':' días');return'hace más de un mes'}
+function showToast(msg,isError=false){let t=$('toast');if(!t){t=document.createElement('div');t.id='toast';t.setAttribute('role','status');t.setAttribute('aria-live','polite');document.body.appendChild(t)}t.textContent=msg;t.className='toast'+(isError?' error':'')+' show';clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),3200)}
+function current(){return state.stories.getById(state.currentStory)}
+
+/* ---------- PERSISTENCIA ---------- */
+function save(){try{localStorage.setItem('roleverseData',JSON.stringify(state))}catch(e){showToast('No se pudo guardar: el almacenamiento está lleno. Elimina alguna imagen o exporta una copia de seguridad.',true)}}
+function exportData(){downloadBlob(JSON.stringify(state,null,2),'roleverse-backup-'+new Date().toISOString().slice(0,10)+'.json','application/json');showToast('Copia de seguridad descargada')}
+function triggerImport(){$('importFile').click()}
+function importData(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!data||!Array.isArray(data.stories)||!Array.isArray(data.characters))throw Error();if(!confirm('Esto reemplazará todos tus datos actuales por los del archivo importado. ¿Continuar?'))return;Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,data);state.characters.forEach(normalizeCharacter);state.stories.forEach(s=>{normalizeStory(s);s.messages.forEach(m=>{normalizeMessage(m);if(!m.characterId){const c=state.characters.find(x=>x.name===m.speaker);if(c)m.characterId=c.id}})});hydrateCollections();save();renderAll();showToast('Datos importados correctamente')}catch(e){showToast('No se pudo importar: el archivo no tiene un formato válido.',true)}};r.readAsText(file);$('importFile').value=''}
+function downloadBlob(content,name,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+
+/* ---------- NAVEGACIÓN ---------- */
+const screenHistory=['home'];let historyIndex=0,navigatingHistory=false;
+function showScreen(id,push=true){closeDrawers();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));const target=$(id);if(!target)return;target.classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));const label=id==='home'?'historias':id==='characters'?'personajes':'';if(label)[...document.querySelectorAll('.nav button')].find(x=>x.textContent.toLowerCase().includes(label))?.classList.add('active');if(push&&!navigatingHistory){screenHistory.splice(historyIndex+1);if(screenHistory[historyIndex]!==id){screenHistory.push(id);historyIndex++}history.pushState({screen:id},'',`#${id}`)}$('backBtn')?.classList.toggle('show',historyIndex>0);if(id==='roleplay')renderRoleplay();if(id==='characters')renderCharacterCards()}
+function enterStory(id){state.currentStory=id;save();showScreen('roleplay')}
+function goBack(){if(historyIndex>0)history.back();else showScreen('home',false)}
+function toggleDrawer(id){const panel=$(id),overlay=$('drawerOverlay');if(!panel)return;const opening=!panel.classList.contains('open');closeDrawers();if(opening){panel.classList.add('open');overlay.classList.add('show')}}
+function closeDrawers(){$('sidePanel')?.classList.remove('open');$('infoPanel')?.classList.remove('open');$('drawerOverlay')?.classList.remove('show')}
+window.addEventListener('popstate',()=>{const id=(location.hash||'#home').slice(1);navigatingHistory=true;if(historyIndex>0)historyIndex--;const known=screenHistory[historyIndex]||'home';showScreen(id||known,false);screenHistory[historyIndex]=id||known;navigatingHistory=false;$('backBtn')?.classList.toggle('show',historyIndex>0)})
+
+/* ---------- FORMULARIOS DE PERSONAJES ---------- */
+let editorImageCleared=false;
+function splitList(value){return String(value||'').split(/[\n,]/).map(x=>x.replace(/^[-•*]\s*/,'').trim()).filter(Boolean)}
+function formStats(prefix){return Object.fromEntries(STAT_CONFIG.map(s=>[s.key,Number($(prefix+s.id)?.value)||0]))}
+function setFormStats(prefix,stats={}){STAT_CONFIG.forEach(s=>{const input=$(prefix+s.id),out=$(prefix+s.id+'Value');if(input)input.value=stats[s.key]??STAT_DEFAULT;if(out)out.value=stats[s.key]??STAT_DEFAULT})}
+function updateRankUI(prefix=''){
+ const values=STAT_CONFIG.map(s=>Number($(prefix+s.id)?.value)||0),power=Math.round(values.reduce((a,b)=>a+b,0)/values.length),rank=getRank(power);
+ const p=$(prefix?'newPowerValue':'powerValue'),r=$(prefix?'newRankValue':'rankValue'),f=$(prefix?'newRankFill':'rankFill');if(p)p.textContent=power;if(r){r.textContent=rank;r.className='rank-'+rank.toLowerCase()}if(f)f.style.width=power+'%';
+ const box=$('attributeRanks');if(box&&!prefix)box.innerHTML='<h4>🎖️ Rangos por atributo</h4>'+STAT_CONFIG.map((s,i)=>`<div class="rank-row"><span>${s.label}</span><strong class="rank-${getRank(values[i]).toLowerCase()}">${getRank(values[i])}</strong></div>`).join('');
+}
+function updateStatValue(inputId,outputId){const input=$(inputId),out=$(outputId);if(input&&out)out.value=input.value;updateRankUI()}
+function updateNewStatValue(inputId,outputId){const input=$(inputId),out=$(outputId);if(input&&out)out.value=input.value;updateRankUI('new')}
+function toggleCharacterTypeFields(selectId,wrapId){const select=$(selectId),wrap=$(wrapId);if(select&&wrap)wrap.style.display=select.value==='narrator'?'none':''}
+function readCharacterForm(mode='new',base={}){
+ const p=mode==='edit'?'edit':'char';const type=$(mode==='edit'?'editType':'charType').value;const isNarrator=type==='narrator';
+ const name=$(mode==='edit'?'editName':'charName').value.trim()||'Sin nombre';
+ const initial=$(mode==='edit'?'editInitial':'charInitial')?.value.trim()||name[0];
+ const imageUrl=$(mode==='edit'?'editImageUrl':'charImageUrl').value.trim();const imageFile=$(mode==='edit'?'editImageFile':'charImageFile').files[0];
+ const stats=isNarrator?defaultStats():formStats(mode==='edit'?'stat':'newStat');
+ return {name,type,initial,imageUrl,imageFile,mine:isNarrator?false:!!$(mode==='edit'?'editMine':'charMine')?.checked,profile:isNarrator?{weight:'Sin definir',height:'Sin definir',gender:'Sin definir'}:{weight:$(mode==='edit'?'editWeight':'newCharWeight').value.trim()||'Sin definir',height:$(mode==='edit'?'editHeight':'newCharHeight').value.trim()||'Sin definir',gender:$(mode==='edit'?'editGender':'newCharGender').value.trim()||'Sin definir'},preferences:isNarrator?{likes:'Sin definir',sexualLikes:'Sin definir'}:{likes:$(mode==='edit'?'editLikes':'newCharLikes').value.trim()||'Sin definir',sexualLikes:$(mode==='edit'?'editSexualLikes':'newCharSexualLikes').value.trim()||'Sin definir'},abilities:isNarrator?[]:splitList($(mode==='edit'?'editSkills':'newCharSkills').value),history:isNarrator?'':$(mode==='edit'?'editHistory':'newCharHistory').value.trim(),stats,base,imageFile}
+}
+async function saveCharacter(character,mode='new'){
+ const form=readCharacterForm(mode,character),target=character||{};target.id??=makeId('char');target.name=form.name;target.type=form.type;target.mine=form.mine;target.appearance??={};target.appearance.initial=form.type==='narrator'?'✦':form.initial;target.profile=form.profile;target.preferences=form.preferences;target.abilities=form.abilities;target.history=form.history;target.stats=form.stats;
+ if(form.imageFile)target.appearance.image=await readImage(form.imageFile,1200,.82);
+ if(editorImageCleared&&mode==='edit'){target.appearance.image='';target.appearance.imageUrl=''}else if(form.imageFile){target.appearance.imageUrl=''}else if(form.imageUrl){target.appearance.imageUrl=form.imageUrl;target.appearance.image=''}else if(mode==='edit'){target.appearance.imageUrl=''}
+  if(mode==='new')state.characters.add(target);
+ return target
+}
+function resetNewCharacterForm(){['charName','charInitial','newCharWeight','newCharHeight','newCharGender','newCharLikes','newCharSexualLikes','newCharSkills','newCharHistory','charImageUrl'].forEach(id=>{if($(id))$(id).value=''});if($('charMine'))$('charMine').checked=false;setFormStats('newStat');clearNewCharacterImage();$('charType').value='character';toggleCharacterTypeFields('charType','charExtraFields');updateRankUI('new')}
+function openCharacterModal(){closeModals();resetNewCharacterForm();$('characterModal').classList.add('show');setTimeout(()=>$('charName')?.focus(),50)}
+function openCharacterEditor(index){closeModals();editorImageCleared=false;const c=state.characters.get(index);if(!c)return;$('editCharIndex').value=index;$('editName').value=characterName(c);$('editInitial').value=c.appearance.initial||'';$('editWeight').value=c.profile.weight||'';$('editHeight').value=c.profile.height||'';$('editGender').value=c.profile.gender||'';$('editImageUrl').value=c.appearance.imageUrl||'';previewImage(c.appearance.imageUrl||c.appearance.image,'editImagePreview');$('editImageFile').value='';$('editType').value=c.type||'character';toggleCharacterTypeFields('editType','editExtraFields');$('editMine').checked=!!c.mine;$('editLikes').value=c.preferences.likes||'';$('editSexualLikes').value=c.preferences.sexualLikes||'';$('editSkills').value=(c.abilities||[]).join('\n');setFormStats('stat',c.stats);$('editHistory').value=c.history||'';updateRankUI();$('editorModal').classList.add('show')}
+async function createCharacter(){const name=$('charName').value.trim();if(!name){showToast('Escribe un nombre para el personaje',true);$('charName').focus();return}try{editorImageCleared=false;await saveCharacter(null,'new');save();closeModals();renderAll()}catch(e){showToast('No se pudo procesar la imagen.',true)}}
+async function saveCharacterEditor(){const i=Number($('editCharIndex').value),c=state.characters[i];if(!c)return;const oldName=c.name;try{await saveCharacter(c,'edit');state.stories.forEach(s=>s.messages.forEach(m=>{if(m.characterId===c.id||(!m.characterId&&m.speaker===oldName)){m.characterId=c.id;m.speaker=c.name}}));editorImageCleared=false;save();closeModals();renderAll()}catch(e){showToast('No se pudo procesar la imagen.',true)}}
+function deleteCharacter(){const i=Number($('editCharIndex').value),c=state.characters[i];if(!c)return;if(!confirm(`¿Eliminar a "${characterName(c)}"? También se quitarán sus mensajes de las historias.`))return;state.characters.removeById(c.id);state.stories.forEach(s=>s.messages=Collection.from(s.messages.filter(m=>m.characterId!==c.id&&m.speaker!==c.name)));save();closeModals();renderAll()}
+
+/* ---------- HISTORIAS ---------- */
+let editorStoryImageCleared=false;
+function openStoryModal(){closeModals();$('newStoryName').value='';$('newStoryGenre').value='';clearNewStoryImage();$('storyModal').classList.add('show');setTimeout(()=>$('newStoryName')?.focus(),50)}
+function openStoryEditor(id){closeModals();const s=state.stories.getById(id);if(!s)return;$('editStoryId').value=id;$('editStoryName').value=s.name||'';$('editStoryGenre').value=s.genre||'';$('editStoryImageUrl').value=s.imageUrl||'';editorStoryImageCleared=false;previewImage(s.imageUrl||s.image,'editStoryImagePreview');$('editStoryStatus').value=s.status||'Activa';$('editStoryChapter').value=s.chapter||'';$('editStoryLocation').value=s.location||'';$('editStoryScenario').value=s.scenario||'';$('editStoryNotes').value=s.notes||'';$('storyEditorModal').classList.add('show')}
+async function saveStoryEditor(){const id=Number($('editStoryId').value),s=state.stories.getById(id);if(!s)return;s.name=$('editStoryName').value.trim()||'Historia sin nombre';s.genre=$('editStoryGenre').value.trim()||'Roleplay';const file=$('editStoryImageFile').files[0],url=$('editStoryImageUrl').value.trim();if(editorStoryImageCleared){s.image='';s.imageUrl=''}else if(file){s.image=await readImage(file,1400,.8);s.imageUrl=''}else{s.imageUrl=url;s.image=url?s.image:''}s.status=$('editStoryStatus').value;s.chapter=$('editStoryChapter').value.trim()||DEFAULT_STORY.chapter;s.location=$('editStoryLocation').value.trim()||DEFAULT_STORY.location;s.scenario=$('editStoryScenario').value.trim()||DEFAULT_STORY.scenario;s.notes=$('editStoryNotes').value.trim()||'Sin notas.';save();closeModals();renderAll()}
+async function createStory(){const name=$('newStoryName').value.trim();if(!name){showToast('Escribe un nombre para la historia',true);$('newStoryName').focus();return}const file=$('newStoryImageFile').files[0];let image='';if(file)image=await readImage(file,1400,.8);state.stories.add({id:Date.now(),name,genre:$('newStoryGenre').value.trim(),status:'Activa',...DEFAULT_STORY,image,imageUrl:$('newStoryImageUrl').value.trim(),messages:new Collection()});save();closeModals();renderStories()}
+function deleteStory(id){const s=state.stories.getById(id);if(!s)return;if(!confirm(`¿Eliminar la historia "${s.name}"? Se eliminarán también todos sus mensajes. Esta acción no se puede deshacer.`))return;state.stories.removeById(id);state.currentStory=state.stories.length?(state.stories.getById(state.currentStory)?.id||state.stories[0].id):null;save();renderStories();if(!state.currentStory)showScreen('home')}
+function generateScenarioIdea(id){const box=$(id);if(box){box.value=SCENE_IDEAS[Math.floor(Math.random()*SCENE_IDEAS.length)];box.focus()}}
+function exportStoryText(){const s=state.stories.getById(Number($('editStoryId').value))||current();if(!s){showToast('No hay historia para exportar',true);return}let out=s.name+(s.genre?' — '+s.genre:'')+'\n'+(s.chapter||'')+'\n';if(s.location&&s.location!=='Sin definir')out+='Ubicación: '+s.location+'\n';out+='\n---\n\n';s.messages.forEach(m=>out+=(m.type==='dice'?'[Dado] ':'')+m.speaker+' ('+m.time+'):\n'+m.text+'\n'+(m.image?'[imagen adjunta]\n':'')+'\n');downloadBlob(out,(s.name||'historia').replace(/[^\w\-]+/g,'_')+'.txt','text/plain;charset=utf-8');showToast('Historia exportada como texto')}
+
+/* ---------- ROLEPLAY ---------- */
+let editingMsg=null;
+function renderRoleplay(){const s=current();if(!s)return;$('storyTitle').textContent=s.name;$('storyGenre').textContent=s.genre||'Roleplay privado';$('chapter').textContent=s.chapter||DEFAULT_STORY.chapter;$('locationInfo').textContent=s.location||DEFAULT_STORY.location;$('notes').textContent=s.notes||DEFAULT_STORY.notes;$('scenarioInfo').textContent=s.scenario||DEFAULT_STORY.scenario;renderCharacterList();renderSpeakerSelect();renderMessages(s)}
+function renderCharacterList(){const list=$('characterList');if(!list)return;list.innerHTML='';state.characters.forEach((c,i)=>{const b=createButton('', 'character',()=>openCharacterEditor(i));b.innerHTML=`${characterAvatar(c,'avatar','object-fit:cover')}<span>${escapeHtml(characterName(c))}<br><span class="small">${c.type==='narrator'?'Narrador':'Personaje'} · Editar</span></span>`;list.appendChild(b)})}
+function renderSpeakerSelect(){const sel=$('speaker');if(!sel)return;const old=sel.value;sel.innerHTML=state.characters.map(c=>`<option value="${escapeAttr(c.id)}">${escapeHtml(characterName(c))}</option>`).join('');if(state.characters.some(c=>c.id===old))sel.value=old}
+function renderMessages(s){const box=$('messages');box.innerHTML='';const q=($('msgSearch')?.value||'').trim().toLowerCase();s.messages.forEach((m,idx)=>{if(q&&!(m.text||'').toLowerCase().includes(q))return;const c=state.characters.find(x=>x.id===m.characterId)||state.characters.find(x=>x.name===m.speaker);const div=document.createElement('div');div.className='message '+(m.type==='dice'?'dice-roll':m.type==='narrator'?'narrator':c?.mine?'me':'');const avatar=c?c.appearance.imageUrl||c.appearance.image:'';const avatarHtml=avatar?`<img class="msg-avatar" src="${escapeAttr(avatar)}" alt="Foto de ${escapeAttr(m.speaker)}">`:'';if(editingMsg?.storyId===s.id&&editingMsg.idx===idx){div.innerHTML=`<div class="msg-name">${avatarHtml}<span>${escapeHtml(m.speaker)}</span></div><textarea id="editMsgText" class="edit-msg-textarea">${escapeHtml(m.text)}</textarea><div class="row" style="justify-content:flex-end;margin-top:8px"><button class="cancel" onclick="cancelEditMessage()">Cancelar</button><button class="primary" onclick="saveEditMessage(${s.id},${idx})">Guardar</button></div>`;box.appendChild(div);return}const nameRow=(m.type==='narrator'&&!avatar)?'':`<div class="msg-name">${avatarHtml}<span>${escapeHtml(m.speaker)}</span> <span class="msg-time">${escapeHtml(m.time)}</span></div>`;div.innerHTML=`${nameRow}<div class="${m.type==='dice'?'dice-detail':''}">${format(m.text)}</div>${m.image?`<img class="message-image" src="${escapeAttr(m.image)}" alt="Imagen enviada" loading="lazy">`:''}`;const actions=document.createElement('div');actions.className='message-actions';actions.append(createButton('✎ Editar','delete-msg',()=>startEditMessage(s.id,idx)),createButton('🗑 Eliminar','delete-msg',()=>deleteMessage(s.id,idx)));div.appendChild(actions);box.appendChild(div)});if(!box.children.length){const empty=document.createElement('div');empty.className='empty-chat';empty.innerHTML=q?`🔍 No hay mensajes que coincidan con "${escapeHtml(q)}".`:'✨ Aún no hay mensajes en esta historia.<br><span class="small">Escribe el primero abajo para comenzar a construirla.</span>';box.appendChild(empty)}if(!editingMsg)box.scrollTop=box.scrollHeight}
+function startEditMessage(storyId,idx){editingMsg={storyId,idx};renderRoleplay()}function cancelEditMessage(){editingMsg=null;renderRoleplay()}
+function saveEditMessage(storyId,idx){const s=state.stories.getById(storyId),ta=$('editMsgText');if(!s||!ta)return;const text=ta.value.trim();if(!text){cancelEditMessage();return}s.messages[idx].text=text;s.updatedAt=Date.now();editingMsg=null;save();renderRoleplay()}
+function deleteMessage(storyId,idx){const s=state.stories.getById(storyId);if(!s||idx<0||idx>=s.messages.length)return;if(!confirm('¿Eliminar este mensaje?'))return;s.messages.splice(idx,1);save();renderRoleplay()}
+async function sendMessage(){const input=$('messageInput'),text=input.value.trim(),file=$('messageImageFile').files[0];if(!text&&!file)return;const id=$('speaker').value,c=state.characters.getById(id)||state.characters.find(x=>x.name===id),s=current();if(!s)return;let image='';if(file)image=await readImage(file,1400,.8);s.updatedAt=Date.now();s.messages.add({id:makeId('msg'),characterId:c?.id||null,speaker:c?.name||'Narrador',type:c?.type||'character',text,image,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});input.value='';clearMessageImage();save();renderRoleplay();renderStories()}
+
+/* ---------- IMÁGENES ---------- */
+function previewImage(src,id){const p=$(id);if(!p)return;if(src){p.src=src;p.style.display='block'}else{p.removeAttribute('src');p.style.display='none'}}
+function clearNewCharacterImage(){$('charImageUrl').value='';$('charImageFile').value='';previewImage('','charImagePreview')}
+function clearEditCharacterImage(){editorImageCleared=true;$('editImageUrl').value='';$('editImageFile').value='';previewImage('','editImagePreview')}
+function clearNewStoryImage(){$('newStoryImageUrl').value='';$('newStoryImageFile').value='';previewImage('','newStoryImagePreview')}
+function clearEditStoryImage(){editorStoryImageCleared=true;$('editStoryImageUrl').value='';$('editStoryImageFile').value='';previewImage('','editStoryImagePreview')}
+function clearMessageImage(){$('messageImageFile').value='';$('messageImagePreview').style.display='none';$('messageImagePreviewImg').removeAttribute('src')}
+function readImage(file,maxSize=1200,quality=.82){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,maxSize/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/jpeg',quality))};img.onerror=()=>reject(Error('No se pudo procesar la imagen'));img.src=reader.result};reader.onerror=()=>reject(reader.error||Error('No se pudo leer la imagen'));reader.readAsDataURL(file)})}
+function bindImageInput(inputId,urlId,previewId,onChange){$(urlId)?.addEventListener('input',e=>{if(e.target.value.trim())previewImage(e.target.value.trim(),previewId);onChange?.()});$(inputId)?.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>previewImage(r.result,previewId);r.readAsDataURL(f);onChange?.()})}
+
+/* ---------- RENDERIZADO ---------- */
+function renderCharacterCards(){const box=$('characterCards');if(!box)return;box.innerHTML='';const q=($('characterSearch')?.value||'').trim().toLowerCase();let shown=0;state.characters.forEach((c,i)=>{if(q&&!characterName(c).toLowerCase().includes(q))return;shown++;const d=document.createElement('div');d.className='story character-card';d.onclick=()=>openCharacterEditor(i);const skills=(c.abilities||[]).slice(0,3).join(' · ')||'Sin habilidades definidas';const power=powerOf(c),rank=getRank(power);d.innerHTML=`${characterAvatar(c,'character-image','width:92px;height:92px;border-radius:18px')}<h3>${escapeHtml(characterName(c))}</h3><div class="profile-line">${escapeHtml(c.profile.gender||'Sin género definido')} · ${escapeHtml(c.type==='narrator'?'Narrador':'Personaje')}</div><p>${escapeHtml(skills)}</p><div class="character-stat-summary">⚔️ Poder: <b>${power}/100</b><br>🏆 Rango: <b>${rank}</b></div>`;const edit=createButton('✎ Editar','story-edit',e=>{e.stopPropagation();openCharacterEditor(i)});d.appendChild(edit);box.appendChild(d)});if(!shown)box.innerHTML='<p class="empty-hint">No se encontraron personajes con ese nombre.</p>'}
+function renderStories(){const box=$('stories');if(!box)return;box.innerHTML='';const q=($('storySearch')?.value||'').trim().toLowerCase();let shown=0;state.stories.forEach(s=>{if(q&&!s.name.toLowerCase().includes(q)&&!(s.genre||'').toLowerCase().includes(q))return;shown++;const d=document.createElement('div');d.className='story';d.onclick=()=>enterStory(s.id);const cover=s.imageUrl||s.image;d.classList.toggle('has-cover',!!cover);d.innerHTML=`${cover?`<img class="story-cover" src="${escapeAttr(cover)}" alt="Portada de ${escapeAttr(s.name)}">`:'<div class="story-cover-placeholder">📖</div>'}<h3>${escapeHtml(s.name)}</h3><p>${escapeHtml(s.genre||'Roleplay')}</p><span class="story-meta">💬 ${s.messages.length} ${s.messages.length===1?'mensaje':'mensajes'} · ⏱ ${timeAgo(s.updatedAt)}</span><span class="status status-${(s.status||'Activa').toLowerCase()}">${escapeHtml(s.status||'Activa')}</span>`;const actions=document.createElement('div');actions.className='story-actions';actions.append(createButton('✎ Editar','story-edit',e=>{e.stopPropagation();openStoryEditor(s.id)}),createButton('🗑 Eliminar','story-delete',e=>{e.stopPropagation();deleteStory(s.id)}));d.appendChild(actions);box.appendChild(d)});if(!shown)box.innerHTML=`<p class="empty-hint">${state.stories.length?'No se encontraron historias con esa búsqueda.':'Aún no hay historias. Crea la primera arriba.'}</p>`}
+function renderAll(){renderStories();renderCharacterCards();if(current())renderRoleplay()}
+
+/* ---------- CIERRE / INICIALIZACIÓN ---------- */
+function closeModals(){document.querySelectorAll('.modal').forEach(x=>x.classList.remove('show'));editorImageCleared=false;editorStoryImageCleared=false}
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){const open=document.querySelector('.modal.show');if(open)closeModals();else goBack()}if(e.key==='Enter'&&e.target.tagName==='INPUT'&&e.target.type!=='file'&&e.target.type!=='checkbox'&&e.target.closest('.modal-box')){e.preventDefault();e.target.closest('.modal-box').querySelector('.primary')?.click()}});
+$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+$('messageImageFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('messageImagePreviewImg').src=r.result;$('messageImagePreview').style.display='flex'};r.readAsDataURL(f)});
+bindImageInput('charImageFile','charImageUrl','charImagePreview');bindImageInput('editImageFile','editImageUrl','editImagePreview',()=>editorImageCleared=false);bindImageInput('newStoryImageFile','newStoryImageUrl','newStoryImagePreview');bindImageInput('editStoryImageFile','editStoryImageUrl','editStoryImagePreview',()=>editorStoryImageCleared=false);
+renderAll();
+if(location.hash&&$(location.hash.slice(1))){const initial=location.hash.slice(1);screenHistory[0]=initial;showScreen(initial,false)}else history.replaceState({screen:'home'},'','#home');
+
+/* Fondo de estrellas */
+(function(){const c=document.createElement('canvas');c.id='starfield';document.body.prepend(c);const ctx=c.getContext('2d');let stars=[],w=0,h=0;function resize(){w=c.width=innerWidth;h=c.height=innerHeight;const n=Math.min(170,Math.max(50,Math.round(w/9)));stars=Array.from({length:n},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.3+.25,p:Math.random()*Math.PI*2,s:.4+Math.random()*.9,tint:Math.random()<.12}))}resize();addEventListener('resize',resize);const reduced=matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;function draw(t){ctx.clearRect(0,0,w,h);stars.forEach(st=>{ctx.globalAlpha=.22+.55*Math.abs(Math.sin(t/1000*st.s+st.p));ctx.fillStyle=st.tint?'#c66cff':'#ffffff';ctx.beginPath();ctx.arc(st.x,st.y,st.r,0,6.2832);ctx.fill()});ctx.globalAlpha=1;if(!reduced)requestAnimationFrame(draw)}requestAnimationFrame(draw)})();
+</script>
+</body>
+</html>
