@@ -24,7 +24,7 @@ button{cursor:pointer;border:0}
 .empty-hint{color:var(--muted);grid-column:1/-1;padding:20px 0}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#242034;border:1px solid var(--accent);color:#fff;padding:12px 20px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:min(420px,90vw);text-align:center;font-size:.88rem}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast.error{border-color:#ff7188}
-.edit-msg-textarea{width:100%;min-height:70px;background:#222230;border:1px solid var(--line);color:#fff;border-radius:9px;padding:10px;resize:vertical}
+.edit-msg-textarea{width:100%;min-height:180px;background:#222230;border:1px solid var(--line);color:#fff;border-radius:9px;padding:10px;resize:vertical}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .nav button{background:transparent;color:var(--muted);padding:10px 14px;border-radius:9px}.nav button:hover,.nav button.active{background:var(--panel2);color:#fff}
 .screen{display:none}.screen.active{display:block}
@@ -172,9 +172,9 @@ h1,h2,h3,.brand,.stats-title,.stats-group h4{font-family:'Cinzel',Georgia,'Times
 <style>
 /* Clases estructurales para mantener el HTML limpio */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.textarea-md{width:100%;height:70px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:6px 0 13px}
-.textarea-lg{width:100%;height:150px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:6px 0 13px}
-.textarea-scene{width:100%;height:100px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:7px 0 15px}
+.textarea-md{width:100%;height:120px;min-height:120px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:6px 0 13px}
+.textarea-lg{width:100%;height:220px;min-height:220px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:6px 0 13px}
+.textarea-scene{width:100%;height:150px;min-height:150px;background:#262635;border:1px solid #464458;color:#fff;padding:12px;border-radius:9px;margin:7px 0 15px}
 .modal-wide{max-height:90vh;overflow:auto;width:min(720px,100%)}
 .checkbox-label{display:flex!important;align-items:center;gap:8px;margin:4px 0 15px;cursor:pointer}
 .field-full{grid-column:1/-1}
@@ -219,6 +219,14 @@ h1,h2,h3,.brand,.stats-title,.stats-group h4{font-family:'Cinzel',Georgia,'Times
   .upload-preview img{width:40px;height:40px;}
 }
 
+@media(max-width:850px){
+  .edit-msg-textarea{min-height:220px;height:220px;font-size:1rem;line-height:1.55;}
+  .textarea-md{height:130px;min-height:130px;}
+  .textarea-lg{height:240px;min-height:240px;}
+  .textarea-scene{height:170px;min-height:170px;}
+  .composer textarea{height:110px;min-height:110px;max-height:220px;resize:none;overflow-y:auto;line-height:1.45;}
+}
+
 @media(max-width:420px){
   .chat-head{padding:9px 12px;}
   .chat-head b{font-size:.92rem;}
@@ -227,10 +235,286 @@ h1,h2,h3,.brand,.stats-title,.stats-group h4{font-family:'Cinzel',Georgia,'Times
   .message{max-width:94%;padding:9px 10px;font-size:.88rem;line-height:1.48;}
   .composer{padding:7px;}
   .composer select{height:42px;font-size:.86rem;}
-  .composer textarea{height:48px;min-height:48px;font-size:.88rem;}
+  .composer textarea{height:100px;min-height:100px;max-height:200px;font-size:.88rem;}
   .composer .send{height:42px;min-height:42px;padding:0 13px;font-size:.88rem;}
 }
 </style>
+
+<style>
+/* ===== ROLEVERSE — vista de historia compacta estilo servidor ===== */
+body.roleplay-mode{
+  overflow:hidden;
+}
+body.roleplay-mode .topbar{
+  min-height:54px;
+  height:54px;
+  padding:6px 14px;
+}
+body.roleplay-mode .brand{font-size:.9rem;letter-spacing:.8px}
+body.roleplay-mode .role-layout{
+  height:calc(100vh - 54px);
+  grid-template-columns:220px minmax(0,1fr) 240px;
+}
+body.roleplay-mode .side{
+  padding:12px;
+}
+body.roleplay-mode .side h3{
+  font-size:.9rem;
+  margin:2px 4px 10px;
+}
+body.roleplay-mode .character{
+  padding:8px;
+  margin:5px 0;
+  gap:8px;
+  border-radius:7px;
+  font-size:.84rem;
+}
+body.roleplay-mode .character .avatar{width:30px;height:30px;flex:0 0 30px}
+body.roleplay-mode .character .small{font-size:.68rem}
+body.roleplay-mode .add{
+  padding:8px;
+  margin-top:7px;
+  font-size:.8rem;
+}
+body.roleplay-mode .chat{
+  background:#111119;
+}
+body.roleplay-mode .chat-head{
+  min-height:48px;
+  height:48px;
+  padding:8px 16px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  border-bottom:1px solid #292938;
+}
+body.roleplay-mode .chat-head b{font-size:.9rem;line-height:1.15}
+body.roleplay-mode .chat-head .small{font-size:.7rem;line-height:1.1}
+body.roleplay-mode .chat-search{
+  height:34px;
+  padding:7px 10px;
+  margin:7px 12px 0;
+  width:calc(100% - 24px);
+  border-radius:7px;
+  font-size:.78rem;
+}
+body.roleplay-mode .messages{
+  padding:12px 16px 16px;
+  gap:2px;
+}
+body.roleplay-mode .message{
+  width:100%;
+  max-width:100%;
+  padding:8px 10px;
+  margin:0;
+  border:0;
+  border-radius:5px;
+  background:transparent;
+  line-height:1.45;
+  font-size:.88rem;
+  transition:background .15s;
+}
+body.roleplay-mode .message:hover{background:rgba(255,255,255,.025)}
+body.roleplay-mode .message.me{
+  align-self:stretch;
+  background:transparent;
+  border-left:2px solid var(--accent);
+  border-radius:0 5px 5px 0;
+}
+body.roleplay-mode .message.narrator{
+  max-width:760px;
+  padding:9px 14px;
+  margin:7px auto;
+  background:#1a1924;
+  border:1px dashed #454258;
+  border-radius:7px;
+}
+body.roleplay-mode .msg-name{
+  font-size:.78rem;
+  margin-bottom:3px;
+  gap:6px;
+}
+body.roleplay-mode .msg-avatar{width:28px;height:28px}
+body.roleplay-mode .msg-time{font-size:.64rem;margin-left:5px}
+body.roleplay-mode .message-actions{
+  margin-top:4px;
+  opacity:0;
+  transition:opacity .15s;
+}
+body.roleplay-mode .message:hover .message-actions{opacity:1}
+body.roleplay-mode .delete-msg{padding:3px 7px;font-size:.68rem}
+body.roleplay-mode .message-image{
+  max-width:min(480px,100%);
+  max-height:360px;
+  border-radius:7px;
+  margin-top:7px;
+}
+body.roleplay-mode .right{
+  padding:12px;
+}
+body.roleplay-mode .right .info{
+  padding:10px;
+  margin-bottom:8px;
+  border-radius:7px;
+}
+body.roleplay-mode .right .info h4{font-size:.78rem;margin-bottom:5px}
+body.roleplay-mode .right .info p{font-size:.75rem;line-height:1.4}
+body.roleplay-mode .composer{
+  padding:8px 12px;
+  grid-template-columns:130px minmax(0,1fr) auto;
+  gap:7px;
+  background:#181821;
+}
+body.roleplay-mode .composer select,
+body.roleplay-mode .composer textarea{
+  border-radius:7px;
+  padding:8px 10px;
+  font-size:.82rem;
+}
+body.roleplay-mode .composer textarea{height:46px;min-height:46px}
+body.roleplay-mode .composer .send{
+  min-height:46px;
+  height:46px;
+  padding:0 15px;
+  border-radius:7px;
+  font-size:.82rem;
+}
+body.roleplay-mode .image-upload-label{
+  padding:6px 9px;
+  border-radius:7px;
+  font-size:.72rem;
+}
+body.roleplay-mode .upload-preview img{width:36px;height:36px}
+
+@media(max-width:850px){
+  body.roleplay-mode{overflow:hidden}
+  body.roleplay-mode .topbar{
+    height:52px;
+    min-height:52px;
+    padding:6px 10px;
+  }
+  body.roleplay-mode .nav,
+  body.roleplay-mode .backup-actions{display:none}
+  body.roleplay-mode .role-layout{
+    height:calc(100vh - 52px);
+    min-height:0;
+    width:100%;
+    max-width:100vw;
+    grid-template-columns:1fr;
+    display:grid;
+    overflow:hidden;
+  }
+
+  /* En móvil los paneles laterales son cajones; no deben ocupar columnas */
+  body.roleplay-mode .side{
+    position:fixed;
+    top:52px;
+    bottom:0;
+    width:min(82vw,320px);
+    z-index:16;
+  }
+  body.roleplay-mode .side:not(.right){
+    left:0;
+    transform:translateX(-105%);
+  }
+  body.roleplay-mode .side.right{
+    left:auto;
+    right:0;
+    transform:translateX(105%);
+  }
+  body.roleplay-mode .side.open{
+    transform:translateX(0);
+  }
+  body.roleplay-mode .drawer-overlay{
+    top:52px;
+    bottom:0;
+    z-index:15;
+  }
+  body.roleplay-mode .chat{
+    grid-column:1;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    height:100%;
+    min-height:0;
+  }
+  body.roleplay-mode .mobile-tabs{
+    height:42px;
+    padding:5px 8px;
+    gap:5px;
+    position:sticky;
+    top:0;
+  }
+  body.roleplay-mode .mobile-tabs button{
+    padding:6px 8px;
+    font-size:.72rem;
+    border-radius:6px;
+  }
+  body.roleplay-mode .chat-head{height:43px;min-height:43px;padding:6px 11px}
+  body.roleplay-mode .chat-head b{font-size:.82rem}
+  body.roleplay-mode .chat-head .small{font-size:.64rem}
+  body.roleplay-mode .chat-search{height:32px;margin:5px 8px 0;width:calc(100% - 16px);font-size:.74rem}
+  body.roleplay-mode .messages{
+    padding:8px 7px 10px;
+    gap:1px;
+    min-width:0;
+    width:100%;
+    overflow-x:hidden;
+  }
+  body.roleplay-mode .message{padding:7px 7px;font-size:.82rem;line-height:1.42}
+  body.roleplay-mode .message.narrator{padding:7px 9px;margin:5px auto}
+  body.roleplay-mode .msg-name{font-size:.72rem}
+  body.roleplay-mode .msg-avatar{width:25px;height:25px}
+  body.roleplay-mode .msg-time{font-size:.59rem}
+  body.roleplay-mode .composer{
+    padding:6px 7px;
+    gap:5px;
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+  body.roleplay-mode .composer select{
+    grid-column:1;
+    height:36px;
+    font-size:.76rem;
+    padding:6px 8px;
+  }
+  body.roleplay-mode .composer textarea{
+    grid-column:1/-1;
+    grid-row:2;
+    height:70px;
+    min-height:70px;
+    max-height:150px;
+    font-size:.8rem;
+    padding:8px 9px;
+  }
+  body.roleplay-mode .composer .send{
+    grid-column:2;
+    grid-row:1;
+    height:36px;
+    min-height:36px;
+    padding:0 12px;
+    font-size:.76rem;
+  }
+  body.roleplay-mode .image-upload-wrap{grid-row:3}
+  body.roleplay-mode .image-upload-label{padding:6px 8px;font-size:.68rem}
+}
+
+@media(max-width:420px){
+  body.roleplay-mode .messages{padding-left:5px;padding-right:5px}
+  body.roleplay-mode .message{font-size:.79rem;padding:6px 6px}
+  body.roleplay-mode .composer textarea{height:64px;min-height:64px}
+}
+
+/* ===== ROLEVERSE — pantalla de personaje (antes modal a pantalla completa) ===== */
+.character-screen{padding:44px 22px 80px}
+.character-screen .modal-box{width:100%;max-width:720px;margin:0 auto}
+.character-screen .modal-box h2{margin:0 0 20px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.character-screen .row{position:static;margin:26px 0 0;padding-top:20px;border-top:1px solid var(--line);background:none}
+@media(max-width:850px){
+  .character-screen{padding:24px 14px 60px}
+  .character-screen .modal-box{max-height:none;overflow:visible}
+}
+</style>
+
 </head>
 <body>
 <div id="app">
@@ -239,6 +523,10 @@ h1,h2,h3,.brand,.stats-title,.stats-group h4{font-family:'Cinzel',Georgia,'Times
   </div><div class="nav">
     <button class="active" onclick="showScreen('home')">Historias</button>
     <button onclick="showScreen('characters')">Personajes</button>
+  </div><div class="backup-actions" aria-label="Copias de seguridad">
+    <button type="button" onclick="exportData()" title="Exportar copia de seguridad">Exportar</button>
+    <button type="button" onclick="triggerImport()" title="Importar copia de seguridad">Importar</button>
+    <input id="importFile" type="file" accept="application/json,.json" hidden onchange="importData(this.files[0])">
   </div>
 
 </header>
@@ -306,23 +594,9 @@ h1,h2,h3,.brand,.stats-title,.stats-group h4{font-family:'Cinzel',Georgia,'Times
 </aside>
 </div>
 </section>
-</div>
 
-<div id="storyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="storyModalTitle">
+<section id="characterModal" class="screen character-screen" aria-labelledby="characterModalTitle">
 <div class="modal-box">
-<h2 id="storyModalTitle">Nueva historia</h2>
-<input id="newStoryName" placeholder="Nombre de la historia" aria-label="Nombre de la historia">
-<input id="newStoryGenre" placeholder="Género (Romance, Fantasía, etc.)" aria-label="Género de la historia">
-<label class="upload-label">Imagen de portada (opcional)</label>
-<input id="newStoryImageUrl" type="url" placeholder="URL de imagen (https://...)">
-<div class="file-row"><input id="newStoryImageFile" type="file" accept="image/*"><button type="button" class="clear-image" onclick="clearNewStoryImage()">Quitar imagen</button></div>
-<img id="newStoryImagePreview" class="image-preview" alt="Vista previa de portada">
-<div class="row"><button class="cancel" onclick="closeModals()">Cancelar</button><button class="primary" onclick="createStory()">Crear historia</button></div>
-</div>
-</div>
-
-<div id="characterModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="characterModalTitle">
-<div class="modal-box modal-wide">
 <h2 id="characterModalTitle">Nuevo personaje</h2>
 <label class="upload-label" for="charType">Tipo de personaje</label>
 <select id="charType" aria-label="Tipo de personaje" onchange="toggleCharacterTypeFields('charType','charExtraFields')"><option value="character">Personaje</option><option value="narrator">Narrador</option></select>
@@ -372,13 +646,13 @@ Ejemplo:
 <label style="display:block;margin-top:14px">Historia / trasfondo</label>
 <textarea id="newCharHistory" class="textarea-lg"></textarea>
 </div>
-<div class="row"><button class="cancel" onclick="closeModals()">Cancelar</button><button class="primary" onclick="createCharacter()">Crear</button></div>
+<div class="row"><button class="cancel" onclick="goBack()">Salir</button><button class="primary" onclick="createCharacter()">Crear</button></div>
 </div>
-</div>
+</section>
 
 
-<div id="editorModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="editorModalTitle">
-<div class="modal-box modal-wide">
+<section id="editorModal" class="screen character-screen" aria-labelledby="editorModalTitle">
+<div class="modal-box">
 <h2 id="editorModalTitle">Editar personaje</h2>
 <input id="editCharIndex" type="hidden">
 <div class="editor-grid form-grid">
@@ -430,9 +704,29 @@ Ejemplo:
 <label style="display:block;margin-top:14px">Historia / trasfondo</label>
 <textarea id="editHistory" class="textarea-lg"></textarea>
 </div>
-<div class="row"><button class="danger" onclick="deleteCharacter()">Eliminar personaje/rol</button><button class="cancel" onclick="closeModals()">Cancelar</button><button class="primary" onclick="saveCharacterEditor()">Guardar cambios</button></div>
+<div class="row"><button class="danger" onclick="deleteCharacter()">Eliminar personaje/rol</button><button class="cancel" onclick="goBack()">Salir</button><button class="primary" onclick="saveCharacterEditor()">Guardar cambios</button></div>
+</div>
+</section>
+
+</div>
+
+<div id="storyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="storyModalTitle">
+<div class="modal-box">
+<h2 id="storyModalTitle">Nueva historia</h2>
+<input id="newStoryName" placeholder="Nombre de la historia" aria-label="Nombre de la historia">
+<input id="newStoryGenre" placeholder="Género (Romance, Fantasía, etc.)" aria-label="Género de la historia">
+<label class="upload-label">Imagen de portada (opcional)</label>
+<input id="newStoryImageUrl" type="url" placeholder="URL de imagen (https://...)">
+<div class="file-row"><input id="newStoryImageFile" type="file" accept="image/*"><button type="button" class="clear-image" onclick="clearNewStoryImage()">Quitar imagen</button></div>
+<img id="newStoryImagePreview" class="image-preview" alt="Vista previa de portada">
+<div class="row"><button class="cancel" onclick="closeModals()">Cancelar</button><button class="primary" onclick="createStory()">Crear historia</button></div>
 </div>
 </div>
+
+
+
+
+
 
 <div id="storyEditorModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="storyEditorModalTitle">
 <div class="modal-box">
@@ -487,6 +781,28 @@ const STAT_CONFIG=[
 ];
 const STAT_DEFAULT=5;
 const DEFAULT_STORY={chapter:'Capítulo 1 — El comienzo',location:'Sin definir',scenario:'Sin definir',notes:'Aquí podremos guardar información importante del universo.'};
+const SCENE_IDEAS=[
+ 'Una tormenta obliga a ambos a refugiarse en la misma posada, y solo queda una habitación libre.',
+ 'Durante un festival de linternas, un mensaje oculto en una de ellas cambia el rumbo de la noche.',
+ 'Un objeto olvidado en el bolsillo de un abrigo comienza a brillar al caer la noche.',
+ 'Dos personas quedan encerradas por accidente en una biblioteca antigua al anochecer.',
+ 'Una carta sin remitente llega con instrucciones imposibles de ignorar.',
+ 'El barco que debía partir se retrasa... y con él, una decisión pendiente desde hace años.',
+ 'En el mercado negro aparece a la venta algo que jamás debió salir de su colección.',
+ 'Una apuesta en la taberna termina convirtiéndose en una travesía de madrugada.',
+ 'El reflejo del espejo muestra una habitación distinta a la que están pisando.',
+ 'Una melodía que nadie más escucha guía a uno de los dos hasta un secreto antiguo.',
+ 'Amanece y, por alguna razón, todo el pueblo está desierto.',
+ 'Un desconocido entrega un paquete diciendo: «Esto les pertenecía antes de que olvidaran».',
+ 'La niebla del acantilado revela un sendero que no aparece en ningún mapa.',
+ 'Durante un eclipse, las sombras empiezan a moverse con voluntad propia.',
+ 'Un sueño compartido deja una marca física en ambos al despertar.',
+ 'El faro que lleva años apagado se enciende solo esta noche.',
+ 'En el jardín abandonado florece, por primera vez en un siglo, una flor imposible.',
+ 'Una figura herida aparece en la puerta pidiendo protección... y asegura conocer el pasado de uno de los dos.',
+ 'El reloj de la torre se detiene exactamente cuando se cruzan las miradas.',
+ 'Un mapache ladronzuelo roba el anillo que uno llevaba escondido, empezando una persecución absurda por la ciudad.'
+];
 
 /* ---------- COLECCIONES ---------- */
 // Equivalente ligero a ArrayList: conserva la compatibilidad nativa de Array.
@@ -510,11 +826,25 @@ function hydrateCollections(){
 }
 
 /* ---------- ESTADO / MIGRACIÓN ---------- */
-const state=JSON.parse(localStorage.getItem('roleverseData'))||{
+function createDefaultState(){return {
  stories:[{id:1,name:'Una historia por comenzar',genre:'Fantasía · Romance',...DEFAULT_STORY,messages:[{id:null,speaker:'Narrador',type:'narrator',text:'Toda gran historia comienza con una sola decisión.',time:'Ahora'}]}],
  characters:[{name:'Nyx',initial:'N',type:'character',mine:true},{name:'Amiga',initial:'A',type:'character',mine:false},{name:'Narrador',initial:'✦',type:'narrator',mine:false}],
  currentStory:1
-};
+}}
+function loadState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('roleverseData'));
+    if(!saved||!Array.isArray(saved.stories)||!Array.isArray(saved.characters))return createDefaultState();
+    saved.stories=saved.stories.filter(Boolean).map(story=>({...story,messages:Array.isArray(story.messages)?story.messages:[]}));
+    saved.characters=saved.characters.filter(Boolean);
+    if(!saved.stories.length)saved.currentStory=null;
+    return saved;
+  }catch(error){
+    localStorage.removeItem('roleverseData');
+    return createDefaultState();
+  }
+}
+const state=loadState();
 function makeId(prefix){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9)}
 function defaultStats(){return Object.fromEntries(STAT_CONFIG.map(s=>[s.key,STAT_DEFAULT]))}
 function normalizeCharacter(c){
@@ -529,7 +859,7 @@ function normalizeCharacter(c){
   return c;
 }
 function normalizeStory(s){
-  Object.assign(s,DEFAULT_STORY,s); s.messages??=[]; s.image??='';s.imageUrl??='';s.status??='Activa';s.messages.forEach(normalizeMessage);return s;
+  s.id??=makeId('story');s.name??='Historia sin nombre';s.genre??='Roleplay';Object.assign(s,DEFAULT_STORY,s);s.messages=Array.isArray(s.messages)?s.messages:[];s.image??='';s.imageUrl??='';s.status??='Activa';s.messages.forEach(normalizeMessage);return s
 }
 function normalizeMessage(m){m.id??=makeId('msg');return m}
 state.characters.forEach(normalizeCharacter);state.stories.forEach(s=>{normalizeStory(s);s.messages.forEach(m=>{if(!m.characterId){const c=state.characters.find(x=>x.name===m.speaker);if(c)m.characterId=c.id}})});
@@ -553,20 +883,30 @@ function current(){return state.stories.getById(state.currentStory)}
 function save(){try{localStorage.setItem('roleverseData',JSON.stringify(state))}catch(e){showToast('No se pudo guardar: el almacenamiento está lleno. Elimina alguna imagen o exporta una copia de seguridad.',true)}}
 function exportData(){downloadBlob(JSON.stringify(state,null,2),'roleverse-backup-'+new Date().toISOString().slice(0,10)+'.json','application/json');showToast('Copia de seguridad descargada')}
 function triggerImport(){$('importFile').click()}
-function importData(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!data||!Array.isArray(data.stories)||!Array.isArray(data.characters))throw Error();if(!confirm('Esto reemplazará todos tus datos actuales por los del archivo importado. ¿Continuar?'))return;Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,data);state.characters.forEach(normalizeCharacter);state.stories.forEach(s=>{normalizeStory(s);s.messages.forEach(m=>{normalizeMessage(m);if(!m.characterId){const c=state.characters.find(x=>x.name===m.speaker);if(c)m.characterId=c.id}})});hydrateCollections();save();renderAll();showToast('Datos importados correctamente')}catch(e){showToast('No se pudo importar: el archivo no tiene un formato válido.',true)}};r.readAsText(file);$('importFile').value=''}
+function importData(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!data||!Array.isArray(data.stories)||!Array.isArray(data.characters))throw Error();if(!confirm('Esto reemplazará todos tus datos actuales por los del archivo importado. ¿Continuar?'))return;Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,data);state.characters=state.characters.filter(Boolean);state.stories=state.stories.filter(Boolean);state.characters.forEach(normalizeCharacter);state.stories.forEach(s=>{normalizeStory(s);s.messages.forEach(m=>{normalizeMessage(m);if(!m.characterId){const c=state.characters.find(x=>x.name===m.speaker);if(c)m.characterId=c.id}})});hydrateCollections();state.currentStory=state.stories.find(s=>s.id===state.currentStory)?.id||state.stories[0]?.id||null;save();renderAll();showToast('Datos importados correctamente')}catch(e){showToast('No se pudo importar: el archivo no tiene un formato válido.',true)}};r.readAsText(file);$('importFile').value=''}
 function downloadBlob(content,name,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
 
 /* ---------- NAVEGACIÓN ---------- */
 const screenHistory=['home'];let historyIndex=0,navigatingHistory=false;
-function showScreen(id,push=true){closeDrawers();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));const target=$(id);if(!target)return;target.classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));const label=id==='home'?'historias':id==='characters'?'personajes':'';if(label)[...document.querySelectorAll('.nav button')].find(x=>x.textContent.toLowerCase().includes(label))?.classList.add('active');if(push&&!navigatingHistory){screenHistory.splice(historyIndex+1);if(screenHistory[historyIndex]!==id){screenHistory.push(id);historyIndex++}history.pushState({screen:id},'',`#${id}`)}$('backBtn')?.classList.toggle('show',historyIndex>0);if(id==='roleplay')renderRoleplay();if(id==='characters')renderCharacterCards()}
+function showScreen(id,push=true){document.body.classList.toggle('roleplay-mode',id==='roleplay');closeDrawers();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));const target=$(id);if(!target)return;target.classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));const label=id==='home'?'historias':id==='characters'?'personajes':'';if(label)[...document.querySelectorAll('.nav button')].find(x=>x.textContent.toLowerCase().includes(label))?.classList.add('active');if(push&&!navigatingHistory){screenHistory.splice(historyIndex+1);if(screenHistory[historyIndex]!==id){screenHistory.push(id);historyIndex++}history.pushState({screen:id},'',`#${id}`)}$('backBtn')?.classList.toggle('show',historyIndex>0);if(id==='roleplay')renderRoleplay();if(id==='characters')renderCharacterCards()}
 function enterStory(id){state.currentStory=id;save();showScreen('roleplay')}
 function goBack(){if(historyIndex>0)history.back();else showScreen('home',false)}
 function toggleDrawer(id){const panel=$(id),overlay=$('drawerOverlay');if(!panel)return;const opening=!panel.classList.contains('open');closeDrawers();if(opening){panel.classList.add('open');overlay.classList.add('show')}}
 function closeDrawers(){$('sidePanel')?.classList.remove('open');$('infoPanel')?.classList.remove('open');$('drawerOverlay')?.classList.remove('show')}
-window.addEventListener('popstate',()=>{const id=(location.hash||'#home').slice(1);navigatingHistory=true;if(historyIndex>0)historyIndex--;const known=screenHistory[historyIndex]||'home';showScreen(id||known,false);screenHistory[historyIndex]=id||known;navigatingHistory=false;$('backBtn')?.classList.toggle('show',historyIndex>0)})
+window.addEventListener('popstate',()=>{
+  const id=(location.hash||'#home').slice(1);
+  navigatingHistory=true;
+  if(historyIndex>0)historyIndex--;
+  const known=screenHistory[historyIndex]||'home';
+  showScreen(id||known,false);
+  screenHistory[historyIndex]=id||known;
+  navigatingHistory=false;
+  $('backBtn')?.classList.toggle('show',historyIndex>0);
+})
 
 /* ---------- FORMULARIOS DE PERSONAJES ---------- */
 let editorImageCleared=false;
+
 function splitList(value){return String(value||'').split(/[\n,]/).map(x=>x.replace(/^[-•*]\s*/,'').trim()).filter(Boolean)}
 function formStats(prefix){return Object.fromEntries(STAT_CONFIG.map(s=>[s.key,Number($(prefix+s.id)?.value)||0]))}
 function setFormStats(prefix,stats={}){STAT_CONFIG.forEach(s=>{const input=$(prefix+s.id),out=$(prefix+s.id+'Value');if(input)input.value=stats[s.key]??STAT_DEFAULT;if(out)out.value=stats[s.key]??STAT_DEFAULT})}
@@ -594,11 +934,11 @@ async function saveCharacter(character,mode='new'){
  return target
 }
 function resetNewCharacterForm(){['charName','charInitial','newCharWeight','newCharHeight','newCharGender','newCharLikes','newCharSexualLikes','newCharSkills','newCharHistory','charImageUrl'].forEach(id=>{if($(id))$(id).value=''});if($('charMine'))$('charMine').checked=false;setFormStats('newStat');clearNewCharacterImage();$('charType').value='character';toggleCharacterTypeFields('charType','charExtraFields');updateRankUI('new')}
-function openCharacterModal(){closeModals();resetNewCharacterForm();$('characterModal').classList.add('show');setTimeout(()=>$('charName')?.focus(),50)}
-function openCharacterEditor(index){closeModals();editorImageCleared=false;const c=state.characters.get(index);if(!c)return;$('editCharIndex').value=index;$('editName').value=characterName(c);$('editInitial').value=c.appearance.initial||'';$('editWeight').value=c.profile.weight||'';$('editHeight').value=c.profile.height||'';$('editGender').value=c.profile.gender||'';$('editImageUrl').value=c.appearance.imageUrl||'';previewImage(c.appearance.imageUrl||c.appearance.image,'editImagePreview');$('editImageFile').value='';$('editType').value=c.type||'character';toggleCharacterTypeFields('editType','editExtraFields');$('editMine').checked=!!c.mine;$('editLikes').value=c.preferences.likes||'';$('editSexualLikes').value=c.preferences.sexualLikes||'';$('editSkills').value=(c.abilities||[]).join('\n');setFormStats('stat',c.stats);$('editHistory').value=c.history||'';updateRankUI();$('editorModal').classList.add('show')}
-async function createCharacter(){const name=$('charName').value.trim();if(!name){showToast('Escribe un nombre para el personaje',true);$('charName').focus();return}try{editorImageCleared=false;await saveCharacter(null,'new');save();closeModals();renderAll()}catch(e){showToast('No se pudo procesar la imagen.',true)}}
-async function saveCharacterEditor(){const i=Number($('editCharIndex').value),c=state.characters[i];if(!c)return;const oldName=c.name;try{await saveCharacter(c,'edit');state.stories.forEach(s=>s.messages.forEach(m=>{if(m.characterId===c.id||(!m.characterId&&m.speaker===oldName)){m.characterId=c.id;m.speaker=c.name}}));editorImageCleared=false;save();closeModals();renderAll()}catch(e){showToast('No se pudo procesar la imagen.',true)}}
-function deleteCharacter(){const i=Number($('editCharIndex').value),c=state.characters[i];if(!c)return;if(!confirm(`¿Eliminar a "${characterName(c)}"? También se quitarán sus mensajes de las historias.`))return;state.characters.removeById(c.id);state.stories.forEach(s=>s.messages=Collection.from(s.messages.filter(m=>m.characterId!==c.id&&m.speaker!==c.name)));save();closeModals();renderAll()}
+function openCharacterModal(){closeModals(false);resetNewCharacterForm();showScreen('characterModal');setTimeout(()=>$('charName')?.focus(),50)}
+function openCharacterEditor(index){closeModals(false);editorImageCleared=false;const c=state.characters.get(index);if(!c)return;$('editCharIndex').value=index;$('editName').value=characterName(c);$('editInitial').value=c.appearance.initial||'';$('editWeight').value=c.profile.weight||'';$('editHeight').value=c.profile.height||'';$('editGender').value=c.profile.gender||'';$('editImageUrl').value=c.appearance.imageUrl||'';previewImage(c.appearance.imageUrl||c.appearance.image,'editImagePreview');$('editImageFile').value='';$('editType').value=c.type||'character';toggleCharacterTypeFields('editType','editExtraFields');$('editMine').checked=!!c.mine;$('editLikes').value=c.preferences.likes||'';$('editSexualLikes').value=c.preferences.sexualLikes||'';$('editSkills').value=(c.abilities||[]).join('\n');setFormStats('stat',c.stats);$('editHistory').value=c.history||'';updateRankUI();showScreen('editorModal')}
+async function createCharacter(){const name=$('charName').value.trim();if(!name){showToast('Escribe un nombre para el personaje',true);$('charName').focus();return}try{editorImageCleared=false;await saveCharacter(null,'new');save();goBack();renderAll()}catch(e){showToast('No se pudo procesar la imagen.',true)}}
+async function saveCharacterEditor(){const i=Number($('editCharIndex').value),c=state.characters[i];if(!c)return;const oldName=c.name;try{await saveCharacter(c,'edit');state.stories.forEach(s=>s.messages.forEach(m=>{if(m.characterId===c.id||(!m.characterId&&m.speaker===oldName)){m.characterId=c.id;m.speaker=c.name}}));editorImageCleared=false;save();goBack();renderAll()}catch(e){showToast('No se pudo procesar la imagen.',true)}}
+function deleteCharacter(){const i=Number($('editCharIndex').value),c=state.characters[i];if(!c)return;if(!confirm(`¿Eliminar a "${characterName(c)}"? También se quitarán sus mensajes de las historias.`))return;state.characters.removeById(c.id);state.stories.forEach(s=>s.messages=Collection.from(s.messages.filter(m=>m.characterId!==c.id&&m.speaker!==c.name)));save();goBack();renderAll()}
 
 /* ---------- HISTORIAS ---------- */
 let editorStoryImageCleared=false;
@@ -619,7 +959,7 @@ function renderMessages(s){const box=$('messages');box.innerHTML='';const q=($('
 function startEditMessage(storyId,idx){editingMsg={storyId,idx};renderRoleplay()}function cancelEditMessage(){editingMsg=null;renderRoleplay()}
 function saveEditMessage(storyId,idx){const s=state.stories.getById(storyId),ta=$('editMsgText');if(!s||!ta)return;const text=ta.value.trim();if(!text){cancelEditMessage();return}s.messages[idx].text=text;s.updatedAt=Date.now();editingMsg=null;save();renderRoleplay()}
 function deleteMessage(storyId,idx){const s=state.stories.getById(storyId);if(!s||idx<0||idx>=s.messages.length)return;if(!confirm('¿Eliminar este mensaje?'))return;s.messages.splice(idx,1);save();renderRoleplay()}
-async function sendMessage(){const input=$('messageInput'),text=input.value.trim(),file=$('messageImageFile').files[0];if(!text&&!file)return;const id=$('speaker').value,c=state.characters.getById(id)||state.characters.find(x=>x.name===id),s=current();if(!s)return;let image='';if(file)image=await readImage(file,1400,.8);s.updatedAt=Date.now();s.messages.add({id:makeId('msg'),characterId:c?.id||null,speaker:c?.name||'Narrador',type:c?.type||'character',text,image,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});input.value='';clearMessageImage();save();renderRoleplay();renderStories()}
+async function sendMessage(){const input=$('messageInput'),text=input.value.trim(),file=$('messageImageFile').files[0];if(!text&&!file)return;const id=$('speaker').value,c=state.characters.getById(id)||state.characters.find(x=>x.name===id),s=current();if(!s)return;let image='';if(file)image=await readImage(file,1400,.8);s.updatedAt=Date.now();s.messages.add({id:makeId('msg'),characterId:c?.id||null,speaker:c?.name||'Narrador',type:c?.type||'character',text,image,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});input.value='';input.style.height='';clearMessageImage();save();renderRoleplay();renderStories()}
 
 /* ---------- IMÁGENES ---------- */
 function previewImage(src,id){const p=$(id);if(!p)return;if(src){p.src=src;p.style.display='block'}else{p.removeAttribute('src');p.style.display='none'}}
@@ -637,11 +977,21 @@ function renderStories(){const box=$('stories');if(!box)return;box.innerHTML='';
 function renderAll(){renderStories();renderCharacterCards();if(current())renderRoleplay()}
 
 /* ---------- CIERRE / INICIALIZACIÓN ---------- */
-function closeModals(){document.querySelectorAll('.modal').forEach(x=>x.classList.remove('show'));editorImageCleared=false;editorStoryImageCleared=false}
+function closeModals(){
+  document.querySelectorAll('.modal').forEach(x=>x.classList.remove('show'));
+  editorImageCleared=false;
+  editorStoryImageCleared=false;
+}
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){const open=document.querySelector('.modal.show');if(open)closeModals();else goBack()}if(e.key==='Enter'&&e.target.tagName==='INPUT'&&e.target.type!=='file'&&e.target.type!=='checkbox'&&e.target.closest('.modal-box')){e.preventDefault();e.target.closest('.modal-box').querySelector('.primary')?.click()}});
 $('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
 $('messageImageFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('messageImagePreviewImg').src=r.result;$('messageImagePreview').style.display='flex'};r.readAsDataURL(f)});
 bindImageInput('charImageFile','charImageUrl','charImagePreview');bindImageInput('editImageFile','editImageUrl','editImagePreview',()=>editorImageCleared=false);bindImageInput('newStoryImageFile','newStoryImageUrl','newStoryImagePreview');bindImageInput('editStoryImageFile','editStoryImageUrl','editStoryImagePreview',()=>editorStoryImageCleared=false);
+
+// El editor de mensajes crece con el contenido sin perder el resto de la conversación.
+function autoResizeComposer(){const el=$('messageInput');if(!el)return;el.style.height='auto';const max=window.innerWidth<=420?200:220;el.style.height=Math.min(el.scrollHeight,max)+'px'}
+$('messageInput').addEventListener('input',autoResizeComposer);
+$('messageInput').addEventListener('focus',()=>setTimeout(autoResizeComposer,50));
+
 renderAll();
 if(location.hash&&$(location.hash.slice(1))){const initial=location.hash.slice(1);screenHistory[0]=initial;showScreen(initial,false)}else history.replaceState({screen:'home'},'','#home');
 
